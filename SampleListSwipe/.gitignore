@@ -1,0 +1,20 @@
+# Android Studio project settings
+*.iml
+/.idea
+
+# Gradle temp folders and local files
+.gradle
+/local.properties
+
+# Build files
+/build
+/captures
+.externalNativeBuild
+
+# Mac files
+.DS_Store
+
+# Visual Studio Code project settings
+.settings
+.project
+.classpath
