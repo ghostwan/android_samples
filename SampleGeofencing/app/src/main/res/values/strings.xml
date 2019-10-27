@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SampleGeofencing</string>
+    <string name="action_settings">Settings</string>
+    <string name="are_you_home">Are you home ?</string>
+    <string name="i_am_home">I am home</string>
+    <string name="come_home">Come home</string>
+    <string name="leave_home">Leave home</string>
+    <string name="i_left_home">I left</string>
+    <string name="no_history_yet">No history yet!</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+</resources>
