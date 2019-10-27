@@ -4,9 +4,14 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.ghostwan.sample.geofencing.data.Source
+import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.ui.MainActivity
+import com.ghostwan.sample.geofencing.ui.MainContract
 import org.koin.android.ext.android.inject
 
 class IAHomeTileService : TileService(), MainContract.View {
+
 
     private val presenter by inject<MainContract.Presenter>()
 
@@ -48,6 +53,9 @@ class IAHomeTileService : TileService(), MainContract.View {
 
     override fun askIsHome() {
         startActivity(Intent(this, MainActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+    }
+
+    override fun showEventList(events: List<Event>) {
     }
 
 }

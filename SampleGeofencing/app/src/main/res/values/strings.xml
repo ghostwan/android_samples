@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">SampleGeofencing</string>
     <string name="action_settings">Settings</string>
+    <string name="action_clear">Clear database</string>
     <string name="are_you_home">Are you home ?</string>
     <string name="i_am_home">I am home</string>
     <string name="come_home">Come home</string>

@@ -1,6 +1,7 @@
-package com.ghostwan.sample.geofencing
+package com.ghostwan.sample.geofencing.ui
 
-import android.content.Context
+import com.ghostwan.sample.geofencing.data.Source
+import com.ghostwan.sample.geofencing.data.model.Event
 
 interface MainContract {
     interface Presenter {
@@ -9,16 +10,14 @@ interface MainContract {
         fun leaveHome(source: Source)
         fun enterHome(source: Source)
         fun updateStatus()
+        fun refreshEventList()
+        fun clearDatabase()
     }
 
     interface View {
         fun setIsHome(isHome: Boolean)
         fun askIsHome()
+        fun showEventList(events: List<Event>)
     }
 
-    interface Repository {
-        fun isHomeValueExist(context: Context): Boolean
-        fun setHome(context: Context, value: Boolean, source: Source)
-        fun isHome(context: Context): Boolean
-    }
 }

@@ -1,20 +1,27 @@
-package com.ghostwan.sample.geofencing
+package com.ghostwan.sample.geofencing.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ghostwan.sample.geofencing.R
+import com.ghostwan.sample.geofencing.data.Source
+import com.ghostwan.sample.geofencing.data.model.Event
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.android.synthetic.main.content_scrolling.*
 import org.koin.android.ext.android.inject
 
 
 class MainActivity : AppCompatActivity(), MainContract.View {
+
 
     companion object {
         const val INTENT_UPDATE_STATUS: String = "INTENT_UPDATE_STATUS"
@@ -28,11 +35,27 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
     }
 
+    private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(this) }
+    private val viewAdapter: EventAdapter by lazy { EventAdapter() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
         title = ""
+
+        viewAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                viewManager.smoothScrollToPosition(eventList, null, 0)
+            }
+        })
+
+        eventList.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
+
 
     }
 
@@ -64,11 +87,18 @@ class MainActivity : AppCompatActivity(), MainContract.View {
                 fab.setOnClickListener { presenter.enterHome(Source.App) }
             }
         }
+        presenter.refreshEventList()
+    }
+
+    override fun showEventList(events: List<Event>) {
+        viewAdapter.submitList(events.sortedByDescending { it.date })
     }
 
     override fun askIsHome() {
         AlertDialog
-            .Builder(ContextThemeWrapper(this, R.style.AppTheme_NoActionBar))
+            .Builder(ContextThemeWrapper(this,
+                R.style.AppTheme_NoActionBar
+            ))
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
@@ -87,13 +117,10 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.action_clear -> presenter.clearDatabase()
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 }
