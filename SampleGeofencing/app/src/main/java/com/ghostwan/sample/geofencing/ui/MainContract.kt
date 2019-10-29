@@ -12,6 +12,7 @@ interface MainContract {
         fun updateStatus()
         fun refreshEventList()
         fun clearDatabase()
+        fun setHomeLocation(latitude: Long, longitude: Long)
     }
 
     interface View {

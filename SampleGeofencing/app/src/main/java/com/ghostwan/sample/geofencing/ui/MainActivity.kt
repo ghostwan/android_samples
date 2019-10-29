@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     companion object {
         const val INTENT_UPDATE_STATUS: String = "INTENT_UPDATE_STATUS"
+        const val MAPS_REQUEST_CODE = 1
     }
 
     val presenter by inject<MainContract.Presenter>()
@@ -111,7 +112,6 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_scrolling, menu)
         return true
     }
@@ -119,8 +119,24 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_clear -> presenter.clearDatabase()
+            R.id.action_set_home_location -> openHomeLocationActivity()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
+    }
+
+    private fun openHomeLocationActivity() {
+        startActivityForResult(Intent(this, MapsActivity::class.java), MAPS_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode) {
+            MAPS_REQUEST_CODE -> data?.let {
+                presenter.setHomeLocation(
+                    data.getLongExtra(MapsActivity.EXTRA_LATITUDE, 0),
+                    data.getLongExtra(MapsActivity.EXTRA_LONGITUDE, 0))
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

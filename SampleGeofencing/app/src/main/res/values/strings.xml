@@ -10,4 +10,10 @@
     <string name="no_history_yet">No history yet!</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="action_set_home_location">Set home location</string>
+    <string name="permission_granted">Location permission granted: looking for current position</string>
+    <string name="permission_denied">Location permission denied: can\'t get current position</string>
+    <string name="enable_permission">Please enable location permission in application settings</string>
+    <string name="fix">Fix</string>
 </resources>

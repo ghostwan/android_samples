@@ -66,4 +66,7 @@ class MainPresenter(private val repository: Repository) :
             }
         }
     }
+
+    override fun setHomeLocation(latitude: Long, longitude: Long) {
+    }
 }

@@ -26,3 +26,19 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+def getLocalProperty(name) {
+    def env = System.getenv(name)
+    if(env != null) {
+        return env
+    }
+    else {
+        Properties properties = new Properties()
+        try {
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            return properties.getProperty(name)
+        }catch (Exception e) {
+            return null
+        }
+    }
+}

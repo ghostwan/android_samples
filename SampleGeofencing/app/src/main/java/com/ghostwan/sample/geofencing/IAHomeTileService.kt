@@ -12,7 +12,6 @@ import org.koin.android.ext.android.inject
 
 class IAHomeTileService : TileService(), MainContract.View {
 
-
     private val presenter by inject<MainContract.Presenter>()
 
     override fun onStartListening() {
