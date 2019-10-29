@@ -12,6 +12,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Go to https://console.developers.google.com/apis/credentials?project=level-prism-257420 to retrieve the Google API key
+        // And add this key in your local.properties file:
+        // GOOGLE_MAP_KEY=AIz....
         resValue "string", "GOOGLE_MAP_KEY", "${getLocalProperty('GOOGLE_MAP_KEY')}"
     }
     buildTypes {

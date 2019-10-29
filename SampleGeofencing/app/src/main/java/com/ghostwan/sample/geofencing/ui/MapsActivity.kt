@@ -35,8 +35,6 @@ class MapsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        //FIXME can't use the API because no credit card attached yet
-        //enableSearchingPlaces()
     }
 
     override fun onStart() {
@@ -98,27 +96,9 @@ class MapsActivity : AppCompatActivity() {
                     poi.name + "\nPlace ID:" + poi.placeId +
                     "\nLatitude:" + poi.latLng.latitude +
                     " Longitude:" + poi.latLng.longitude,
-                Toast.LENGTH_SHORT).show();
+                Toast.LENGTH_SHORT).show()
         }
     }
 
-    //FIXME uncomment and uncomment in layout when enabling places
-//    private fun enableSearchingPlaces() {
-//        // Initialize Places.
-//        if (!Places.isInitialized()) {
-//            Places.initialize(this, getString(R.string.GOOGLE_MAP_KEY))
-//        }
-//        val placesClient = Places.createClient(this)
-//
-//        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
-//        // and once again when the user makes a selection (for example when calling fetchPlace()).
-//        val token = AutocompleteSessionToken.newInstance()
-//
-//        // Specify the fields to return.
-//        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
-//
-//        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.place_autocomplete_fragment) as AutocompleteSupportFragment
-//        autocompleteFragment.setPlaceFields(placeFields)
-//    }
 
 }
