@@ -1,8 +1,9 @@
-package com.ghostwan.sample.geofencing.ui
+package com.ghostwan.sample.geofencing.ui.main
 
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.Repository
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 
 class MainPresenter(private val repository: Repository) :
@@ -20,13 +21,11 @@ class MainPresenter(private val repository: Repository) :
     }
 
     override fun updateStatus() {
-        launch {
+        launch(Main) {
             if(repository.isHomeValueExist()) {
                 view?.setIsHome(repository.isHome())
             } else {
-                withContext(Dispatchers.Main) {
-                    view?.askIsHome()
-                }
+                view?.askIsHome()
             }
         }
     }
@@ -38,32 +37,30 @@ class MainPresenter(private val repository: Repository) :
     }
 
     override fun leaveHome(source: Source) {
-        launch {
+        launch(Main) {
             repository.setHome( false, source)
             view?.setIsHome(false)
         }
     }
 
     override fun enterHome(source: Source) {
-        launch {
+        launch(Main) {
             repository.setHome( true, source)
         }
         view?.setIsHome(true)
     }
 
     override fun refreshEventList() {
-        launch {
+        launch(Main) {
             view?.showEventList(repository.getEvents())
         }
     }
 
     override fun clearDatabase() {
-        launch {
+        launch(Main) {
             repository.clearEvents()
             view?.showEventList(ArrayList())
-            withContext(Dispatchers.Main) {
-                view?.askIsHome()
-            }
+            view?.askIsHome()
         }
     }
 

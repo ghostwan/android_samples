@@ -6,8 +6,8 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
-import com.ghostwan.sample.geofencing.ui.MainActivity
-import com.ghostwan.sample.geofencing.ui.MainContract
+import com.ghostwan.sample.geofencing.ui.main.MainActivity
+import com.ghostwan.sample.geofencing.ui.main.MainContract
 import org.koin.android.ext.android.inject
 
 class IAHomeTileService : TileService(), MainContract.View {

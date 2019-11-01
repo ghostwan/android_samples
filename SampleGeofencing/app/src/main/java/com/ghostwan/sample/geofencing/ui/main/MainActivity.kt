@@ -1,4 +1,4 @@
-package com.ghostwan.sample.geofencing.ui
+package com.ghostwan.sample.geofencing.ui.main
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.ui.EventAdapter
+import com.ghostwan.sample.geofencing.ui.maps.MapsActivity
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import org.koin.android.ext.android.inject
@@ -103,6 +105,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
+                openHomeLocationActivity()
             }
             .setNegativeButton(R.string.no) { dialog, id ->
                 presenter.leaveHome(Source.App)

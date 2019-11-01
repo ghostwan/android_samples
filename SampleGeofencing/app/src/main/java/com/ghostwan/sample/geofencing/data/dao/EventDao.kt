@@ -7,17 +7,11 @@ import androidx.room.Query
 import com.ghostwan.sample.geofencing.data.model.Event
 
 @Dao
-interface EventDao {
-    @Insert
-    suspend fun insert(event: Event)
-
-    @Delete
-    suspend fun delete(event: Event)
-
+interface EventDao : DefaultDao<Event> {
     @Query("SELECT * FROM Event")
     suspend fun getAll(): List<Event>
 
     @Query("DELETE FROM Event")
-    fun deleteAll()
+    suspend fun deleteAll()
 
 }

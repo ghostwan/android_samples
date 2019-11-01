@@ -1,6 +1,7 @@
 package com.ghostwan.sample.geofencing.data
 
 import androidx.room.TypeConverter
+import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 class Converters {
@@ -23,6 +24,17 @@ class Converters {
     @TypeConverter
     fun valueToSource(value: String): Source {
         return  Source.valueOf(value)
+    }
+
+    @TypeConverter
+    fun latlngToValue(latLng: LatLng): String {
+        return "${latLng.latitude}_${latLng.longitude}"
+    }
+
+    @TypeConverter
+    fun valueTolatlng(value: String): LatLng {
+        val (lat, lng) = value.split("_")
+        return LatLng(lat.toDouble(), lng.toDouble())
     }
 
 

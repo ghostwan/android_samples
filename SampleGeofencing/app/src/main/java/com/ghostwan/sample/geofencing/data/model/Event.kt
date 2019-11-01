@@ -9,6 +9,6 @@ import java.util.*
 data class Event (
     val isHome:Boolean,
     val source: Source,
-    @PrimaryKey(autoGenerate = true) val id:Long?=null,
-    val date: Date = Date()
+    val date: Date = Date(),
+    @PrimaryKey(autoGenerate = true) val id:Long?=null
 )

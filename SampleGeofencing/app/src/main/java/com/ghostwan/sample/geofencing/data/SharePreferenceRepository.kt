@@ -6,7 +6,7 @@ import com.ghostwan.sample.geofencing.data.model.Event
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SharePreferenceRepository(val context: Context) : Repository{
+class SharePreferenceRepository(val context: Context) {
 
     companion object {
         private const val FILE_KEY = "com.ghostwan.sample.geofencing"
@@ -19,11 +19,11 @@ class SharePreferenceRepository(val context: Context) : Repository{
         return context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE)
     }
 
-    override suspend fun isHome(): Boolean {
+     suspend fun isHome(): Boolean {
         return getPref().getBoolean(IS_HOME_KEY, true)
     }
 
-    override suspend fun setHome(value: Boolean, source: Source) {
+     suspend fun setHome(value: Boolean, source: Source) {
         with(getPref().edit()) {
             putBoolean(IS_HOME_KEY, value)
             putString(IS_HOME_SOURCE_KEY, source.name)
@@ -32,11 +32,11 @@ class SharePreferenceRepository(val context: Context) : Repository{
         }
     }
 
-    override suspend fun isHomeValueExist(): Boolean {
+     suspend fun isHomeValueExist(): Boolean {
         return getPref().contains(IS_HOME_KEY)
     }
 
-    override suspend fun getEvents(): List<Event> {
+     suspend fun getEvents(): List<Event> {
         val list = ArrayList<Event>()
         val isHome = getPref().getBoolean(IS_HOME_KEY, true)
         val isHomeSource = Source.valueOf(getPref().getString(IS_HOME_SOURCE_KEY, Source.None.name))
@@ -45,7 +45,7 @@ class SharePreferenceRepository(val context: Context) : Repository{
         return list
     }
 
-    override suspend fun clearEvents() {
+     suspend fun clearEvents() {
         with(getPref().edit()) {
             clear()
             commit()

@@ -1,4 +1,4 @@
-package com.ghostwan.sample.geofencing.ui
+package com.ghostwan.sample.geofencing.ui.main
 
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
