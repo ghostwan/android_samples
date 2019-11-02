@@ -4,6 +4,11 @@
     <color name="colorPrimaryDark">#444242</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="areaCurrentHomeStroke">#8DC92B65</color>
+    <color name="areaCurrentHomeFill">#5EC92B65</color>
+
+    <color name="areaTmpHomeStroke">#5E2BC92E</color>
+    <color name="areaTmpHomeFill">#8A43C92B</color>
 
     <color name="foreground_floating">#000000</color>
     <color name="background_floating">#FFFFFF</color>

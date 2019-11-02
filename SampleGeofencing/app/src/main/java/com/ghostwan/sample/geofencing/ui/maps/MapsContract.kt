@@ -16,8 +16,8 @@ interface MapsContract {
     interface View {
         suspend fun checkAndAskPermissions(): Boolean
         suspend fun prepareMap(hasPermission: Boolean)
-        fun displayHomeMarker(latLng: LatLng)
-        fun displayTmpMarker(latLng: LatLng)
+        fun displayHomeMarker(latLng: LatLng, radius: Double = 10.0)
+        fun displayTmpMarker(latLng: LatLng, radius: Double = 10.0)
         fun moveCamera(latLng: LatLng)
         suspend fun getLastLocation(): Location?
         fun clearTmpPosition()

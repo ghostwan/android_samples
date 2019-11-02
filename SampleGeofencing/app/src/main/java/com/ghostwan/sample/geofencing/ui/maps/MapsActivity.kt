@@ -19,13 +19,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
+import kotlin.reflect.KMutableProperty0
 
 
 class MapsActivity : AppCompatActivity(), MapsContract.View {
@@ -37,8 +35,9 @@ class MapsActivity : AppCompatActivity(), MapsContract.View {
     }
 
     private val mapFragment by lazy { supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment }
-    private var currentHomeMarker: Marker? = null
-    private var currentTmpMarker: Marker? = null
+
+    var currentHomeMarker: Pair<Marker, Circle>? = null
+    var currentTmpMarker: Pair<Marker, Circle>? = null
 
     private val presenter by inject<MapsContract.Presenter>()
     private var googleMap: GoogleMap? = null
@@ -96,39 +95,76 @@ class MapsActivity : AppCompatActivity(), MapsContract.View {
         }
     }
 
-    override fun displayHomeMarker(latLng: LatLng) {
-        currentHomeMarker?.remove()
-        currentHomeMarker = googleMap?.addMarker(
+    fun displayMarker(
+        latLng: LatLng,
+        radius: Double,
+        text: Int,
+        icon: Int,
+        strokeColor: Int,
+        fillColor: Int,
+        pair: KMutableProperty0<out Pair<Marker, Circle>?>
+    ) {
+
+        val marker = googleMap?.addMarker(
             MarkerOptions()
                 .position(latLng)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.home))
-                .title(getString(R.string.current_saved_position))
+                .icon(BitmapDescriptorFactory.fromResource(icon))
+                .title(getString(text))
         )
-        invalidateOptionsMenu()
+
+        val circle = googleMap?.addCircle(
+            CircleOptions()
+                .strokeColor(getColor(strokeColor))
+                .fillColor(getColor(fillColor))
+                .strokeWidth(3f)
+                .center(latLng)
+                .radius(radius)
+        )
+
+        if (circle != null && marker != null) {
+            pair.get()?.first?.remove()
+            pair.get()?.second?.remove()
+            pair.setter.call(Pair(marker, circle))
+            invalidateOptionsMenu()
+        }
 
     }
 
-    override fun displayTmpMarker(latLng: LatLng) {
-        currentTmpMarker?.remove()
-        currentTmpMarker = googleMap?.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.home_tmp))
-                .title(getString(R.string.home_position_question))
+    override fun displayHomeMarker(latLng: LatLng, radius: Double) {
+        displayMarker(
+            latLng, radius,
+            R.string.current_saved_position,
+            R.drawable.home,
+            R.color.areaCurrentHomeStroke,
+            R.color.areaCurrentHomeFill,
+            ::currentHomeMarker
         )
+    }
+
+    override fun displayTmpMarker(latLng: LatLng, radius: Double) {
+        displayMarker(
+            latLng, radius,
+            R.string.home_position_question,
+            R.drawable.home_tmp,
+            R.color.areaTmpHomeStroke,
+            R.color.areaTmpHomeFill,
+            ::currentTmpMarker
+        )
+    }
+
+    fun clearPosition(pair: KMutableProperty0<out Pair<Marker, Circle>?>) {
+        pair.get()?.first?.remove()
+        pair.get()?.second?.remove()
+        pair.setter.call(null)
         invalidateOptionsMenu()
     }
 
     override fun clearTmpPosition() {
-        currentTmpMarker?.remove()
-        currentTmpMarker = null
-        invalidateOptionsMenu()
+        clearPosition(::currentTmpMarker)
     }
 
     override fun clearSavedPosition() {
-        currentHomeMarker?.remove()
-        currentHomeMarker = null
-        invalidateOptionsMenu()
+        clearPosition(::currentHomeMarker)
     }
 
     override fun moveCamera(latLng: LatLng) {
