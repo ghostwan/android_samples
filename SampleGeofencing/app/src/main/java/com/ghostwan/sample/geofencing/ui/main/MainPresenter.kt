@@ -38,14 +38,14 @@ class MainPresenter(private val repository: Repository) :
 
     override fun leaveHome(source: Source) {
         launch(Main) {
-            repository.setHome( false, source)
+            repository.setIsHome( false, source)
             view?.setIsHome(false)
         }
     }
 
     override fun enterHome(source: Source) {
         launch(Main) {
-            repository.setHome( true, source)
+            repository.setIsHome( true, source)
         }
         view?.setIsHome(true)
     }

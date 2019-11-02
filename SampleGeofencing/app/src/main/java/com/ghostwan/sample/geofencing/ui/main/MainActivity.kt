@@ -99,9 +99,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
 
     override fun askIsHome() {
         AlertDialog
-            .Builder(ContextThemeWrapper(this,
-                R.style.AppTheme_NoActionBar
-            ))
+            .Builder(
+                ContextThemeWrapper(
+                    this,
+                    R.style.AppTheme_NoActionBar
+                )
+            )
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
@@ -115,13 +118,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_scrolling, menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_clear -> presenter.clearDatabase()
+            R.id.action_clear_tmp -> presenter.clearDatabase()
             R.id.action_set_home_location -> openHomeLocationActivity()
             else -> return super.onOptionsItemSelected(item)
         }
@@ -133,11 +136,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
+        when (requestCode) {
             MAPS_REQUEST_CODE -> data?.let {
                 presenter.setHomeLocation(
                     data.getLongExtra(MapsActivity.EXTRA_LATITUDE, 0),
-                    data.getLongExtra(MapsActivity.EXTRA_LONGITUDE, 0))
+                    data.getLongExtra(MapsActivity.EXTRA_LONGITUDE, 0)
+                )
             }
         }
         super.onActivityResult(requestCode, resultCode, data)

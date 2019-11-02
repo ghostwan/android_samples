@@ -6,15 +6,17 @@ import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
 import com.google.android.gms.maps.model.LatLng
 
-class RoomRepository(private val eventDao: EventDao,
-                     private val homeDao: HomeDao) : Repository {
+class RoomRepository(
+    private val eventDao: EventDao,
+    private val homeDao: HomeDao
+) : Repository {
 
 
     override suspend fun isHomeValueExist(): Boolean {
         return eventDao.getAll().isNotEmpty()
     }
 
-    override suspend fun setHome(value: Boolean, source: Source) {
+    override suspend fun setIsHome(value: Boolean, source: Source) {
         eventDao.insert(Event(value, source))
     }
 
@@ -32,23 +34,26 @@ class RoomRepository(private val eventDao: EventDao,
         eventDao.deleteAll()
     }
 
-    override suspend fun setHomeData(id: Long?, latLng: LatLng) {
-        if(id != null) {
-            val home = homeDao.get(id)
-            home.latLng = latLng
-            homeDao.update(home)
+    override suspend fun getHomeData(id: Long?): Home? {
+        return if (id != null) {
+            homeDao.get(id)
+        } else {
+            homeDao.getAll().lastOrNull()
         }
-        else {
-            val homes = homeDao.getAll()
-            if(homes.isEmpty()) {
-                val home = Home(latLng)
-                homeDao.insert(home)
-            } else {
-                val home = homes[0]
-                home.latLng = latLng
-                homeDao.update(home)
-            }
-        }
+    }
+
+    override suspend fun saveHomeData(home: Home) {
+        homeDao.update(home)
+    }
+
+    override suspend fun createHome(latLng: LatLng): Home {
+        val home = Home(latLng)
+        homeDao.insert(home)
+        return home
+    }
+
+    override suspend fun deleteHome(home: Home) {
+        homeDao.delete(home)
     }
 
 }

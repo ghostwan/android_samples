@@ -1,6 +1,7 @@
 package com.ghostwan.sample.geofencing
 
-import org.junit.Assert.assertEquals
+import com.ghostwan.sample.geofencing.utils.elseNull
+import com.ghostwan.sample.geofencing.utils.ifNotNull
 import org.junit.Test
 
 /**
@@ -11,6 +12,7 @@ import org.junit.Test
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val test: String? = null
+        test?.ifNotNull { println("I'm not null: $test") } ?: elseNull { println("I'm null!") }
     }
 }
