@@ -17,6 +17,10 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
 
     private var view: MapContract.View? = null
 
+    companion object {
+        const val DEFAULT_RADIUS = 10.0
+    }
+
     private var job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
@@ -38,7 +42,7 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
 
             when {
                 currentHome != null -> {
-                    view?.displayHomeMarker(currentHome!!.latLng)
+                    view?.displayHomeMarker(currentHome!!.latLng, DEFAULT_RADIUS)
                     view?.moveCamera(currentHome!!.latLng)
                 }
                 currentHome == null && permission -> {
@@ -57,7 +61,7 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
 
     override fun setTemporaryMarker(latLng: LatLng) {
         currentPosition = latLng
-        view?.displayTmpMarker(latLng)
+        view?.displayTmpMarker(latLng, DEFAULT_RADIUS)
     }
 
     override fun saveHomePosition() {
@@ -70,7 +74,8 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
                     currentHome = repository.createHome(position)
                 }
                 view?.clearTmpPosition()
-                view?.displayHomeMarker(currentHome!!.latLng)
+                view?.displayHomeMarker(currentHome!!.latLng, DEFAULT_RADIUS)
+                view?.registerGeofencing()
             }
         }
     }

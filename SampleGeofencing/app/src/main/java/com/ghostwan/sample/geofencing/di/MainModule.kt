@@ -4,6 +4,8 @@ import androidx.room.Room
 import com.ghostwan.sample.geofencing.data.Database
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.RoomRepository
+import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
+import com.ghostwan.sample.geofencing.geofencing.NotificationManager
 import com.ghostwan.sample.geofencing.ui.event.EventContract
 import com.ghostwan.sample.geofencing.ui.event.EventPresenter
 import com.ghostwan.sample.geofencing.ui.maps.MapContract
@@ -29,6 +31,8 @@ val mainModule = module {
     }
     single { get<Database>().eventDao() }
     single { get<Database>().homeDao() }
+    single { GeofencingManager(get()) }
+    single { NotificationManager(get()) }
 
 }
 

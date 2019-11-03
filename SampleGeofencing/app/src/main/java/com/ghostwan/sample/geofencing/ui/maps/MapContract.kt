@@ -18,11 +18,12 @@ interface MapContract {
     interface View {
         suspend fun checkAndAskPermissions(): Boolean
         suspend fun prepareMap(hasPermission: Boolean)
-        fun displayHomeMarker(latLng: LatLng, radius: Double = 10.0)
-        fun displayTmpMarker(latLng: LatLng, radius: Double = 10.0)
+        fun displayHomeMarker(latLng: LatLng, radius: Double)
+        fun displayTmpMarker(latLng: LatLng, radius: Double)
         fun moveCamera(latLng: LatLng)
         suspend fun getLastLocation(): Location?
         fun clearTmpPosition()
         fun clearHomePosition()
+        fun registerGeofencing()
     }
 }

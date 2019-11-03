@@ -13,10 +13,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.coroutinespermission.PermissionManager
-import com.ghostwan.sample.geofencing.MainApplication
+import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
+import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
+import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.getGoogleMap
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.LocationServices
@@ -25,17 +27,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.android.inject
-import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KMutableProperty0
 
 
-class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
+class MapFragment : BaseFragment(), MapContract.View {
 
 
     companion object {
@@ -44,9 +42,7 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
     }
 
     private val mapFragment by lazy { childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment }
-
-    private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.Main
+    private val geofencingManager by inject<GeofencingManager>()
 
     var currentHomeMarker: Pair<Marker, Circle>? = null
     var currentTmpMarker: Pair<Marker, Circle>? = null
@@ -54,6 +50,8 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
     private val presenter by inject<MapContract.Presenter>()
     private var googleMap: GoogleMap? = null
     private lateinit var root: View
+
+    private val ctx: Context by lazy { context!! }
 
     override fun getPresenter(): BaseContract.BasePresenter {
         return presenter
@@ -147,8 +145,8 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
 
         val circle = googleMap?.addCircle(
             CircleOptions()
-                .fillColor(context!!.getColor(fillColor))
-                .strokeColor(context!!.getColor(strokeColor))
+                .fillColor(ctx.getColor(fillColor))
+                .strokeColor(ctx.getColor(strokeColor))
                 .strokeWidth(3f)
                 .center(latLng)
                 .radius(radius)
@@ -201,6 +199,8 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
 
     override fun clearHomePosition() {
         clearPosition(::currentHomeMarker)
+        geofencingManager.clearGeofencing()
+        message(R.string.geofencing_added_removed)
     }
 
     override fun moveCamera(latLng: LatLng) {
@@ -210,10 +210,7 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
 
 
     override suspend fun getLastLocation(): Location? {
-        context?.ifNotNull {
-            return LocationServices.getFusedLocationProviderClient(it).lastLocation.await()
-        }
-        return null
+        return LocationServices.getFusedLocationProviderClient(ctx).lastLocation.await()
     }
 
 
@@ -234,17 +231,35 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
     }
 
     fun displayPermissionGranted() {
-        Log.i(MainApplication.TAG, "location permission granted")
+        Log.i(TAG, "location permission granted")
+    }
+
+    fun message(
+        resMessage: Int,
+        duration: Int = Snackbar.LENGTH_LONG,
+        error: String? = null,
+        resAction: Int? = null,
+        action: (() -> Unit)? = null
+    ) {
+        val message = error?.ifNotNull {
+            "${getString(resMessage)} : $error"
+        } ?: elseNull {
+            getString(resMessage)
+        }
+
+        val snack = Snackbar.make(root, message, duration)
+        resAction?.ifNotNull {
+            snack.setAction(resAction) {
+                action?.invoke()
+            }
+        }
+        snack.show()
     }
 
     fun displayPermissionRefused() {
-        Snackbar.make(
-            root,
-            R.string.permission_denied,
-            Snackbar.LENGTH_SHORT
-        ).setAction(R.string.fix) {
+        message(R.string.permission_denied, resAction = R.string.fix) {
             AlertDialog
-                .Builder(ContextThemeWrapper(context, R.style.AppTheme_NoActionBar))
+                .Builder(ContextThemeWrapper(ctx, R.style.AppTheme_NoActionBar))
                 .setMessage(R.string.enable_permission)
                 .setPositiveButton(R.string.yes) { _, _ ->
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -256,11 +271,13 @@ class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
                 .create()
                 .show()
         }
-            .show()
     }
 
     fun updateActionBar() {
         activity?.invalidateOptionsMenu()
     }
 
+    override fun registerGeofencing() {
+        geofencingManager.registerGeofencing()
+    }
 }

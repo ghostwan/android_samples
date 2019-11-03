@@ -6,8 +6,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment(), CoroutineScope {
+
+    private val job = Job()
+    override val coroutineContext: CoroutineContext = job + Dispatchers.Main
 
     companion object {
         const val INTENT_UPDATE_STATUS: String = "INTENT_UPDATE_STATUS"
