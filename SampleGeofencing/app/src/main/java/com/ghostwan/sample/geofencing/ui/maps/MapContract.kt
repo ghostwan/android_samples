@@ -1,10 +1,11 @@
 package com.ghostwan.sample.geofencing.ui.maps
 
 import android.location.Location
+import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.google.android.gms.maps.model.LatLng
 
 interface MapContract {
-    interface Presenter {
+    interface Presenter : BaseContract.BasePresenter {
         fun attachView(view: View)
         fun detachView(view: View)
         fun setTemporaryMarker(latLng: LatLng)

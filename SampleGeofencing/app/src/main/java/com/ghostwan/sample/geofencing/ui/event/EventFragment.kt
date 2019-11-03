@@ -1,40 +1,32 @@
 package com.ghostwan.sample.geofencing.ui.event
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.ui.BaseContract
+import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.maps.MapFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.android.ext.android.inject
 
 
-class EventFragment : Fragment(), EventContract.View {
-
+class EventFragment : BaseFragment(), EventContract.View {
 
     companion object {
-        const val INTENT_UPDATE_STATUS: String = "INTENT_UPDATE_STATUS"
         const val MAPS_REQUEST_CODE = 1
     }
 
     val presenter by inject<EventContract.Presenter>()
-
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(p0: Context?, p1: Intent?) {
-            presenter.updateStatus()
-        }
-    }
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
@@ -43,6 +35,10 @@ class EventFragment : Fragment(), EventContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true);
+    }
+
+    override fun getPresenter(): BaseContract.BasePresenter {
+        return presenter
     }
 
     override fun onCreateView(
@@ -84,13 +80,11 @@ class EventFragment : Fragment(), EventContract.View {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        context.registerReceiver(broadcastReceiver, IntentFilter(INTENT_UPDATE_STATUS))
         presenter.attachView(this)
     }
 
     override fun onDetach() {
         super.onDetach()
-        context?.unregisterReceiver(broadcastReceiver)
         presenter.detachView(this)
     }
 
@@ -100,11 +94,13 @@ class EventFragment : Fragment(), EventContract.View {
             // If I am home I want to say that I left
             activity?.title = getString(R.string.i_am_home)
             fab.setImageResource(R.drawable.exit_home)
+            fab.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.leftTint))
             fab.setOnClickListener { presenter.leaveHome(Source.App) }
         } else {
             // If I am not home I want to say that I came
             activity?.title = getString(R.string.i_left_home)
             fab.setImageResource(R.drawable.enter_home)
+            fab.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.homeTint))
             fab.setOnClickListener { presenter.enterHome(Source.App) }
         }
         presenter.refreshEventList()

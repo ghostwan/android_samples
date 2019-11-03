@@ -4,15 +4,17 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.event.EventContract
-import com.ghostwan.sample.geofencing.ui.event.EventFragment
 import org.koin.android.ext.android.inject
 
 class IAHomeTileService : TileService(), EventContract.View {
 
     private val presenter by inject<EventContract.Presenter>()
+    private val broadcastManager by lazy { LocalBroadcastManager.getInstance(this) }
 
     override fun onStartListening() {
         super.onStartListening()
@@ -48,7 +50,7 @@ class IAHomeTileService : TileService(), EventContract.View {
             qsTile.state = Tile.STATE_INACTIVE
         }
         qsTile.updateTile()
-        sendBroadcast(Intent(EventFragment.INTENT_UPDATE_STATUS))
+        broadcastManager.sendBroadcast(Intent(BaseFragment.INTENT_UPDATE_STATUS))
     }
 
     override fun askIsHome() {

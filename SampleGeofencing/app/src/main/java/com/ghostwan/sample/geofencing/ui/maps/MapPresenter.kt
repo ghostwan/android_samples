@@ -15,7 +15,6 @@ import kotlin.coroutines.CoroutineContext
 
 class MapPresenter(private val repository: Repository) : MapContract.Presenter, CoroutineScope {
 
-
     private var view: MapContract.View? = null
 
     private var job = Job()
@@ -27,22 +26,25 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     override fun attachView(view: MapContract.View) {
         if (this.view == null) {
             this.view = view
-            launch(Main) {
+            updateStatus()
+        }
+    }
 
-                currentHome = repository.getHomeData()
-                val permission = view.checkAndAskPermissions()
-                view.prepareMap(permission)
+    override fun updateStatus() {
+        launch(Main) {
+            currentHome = repository.getHomeData()
+            val permission = view?.checkAndAskPermissions() ?: false
+            view?.prepareMap(permission)
 
-                when {
-                    currentHome != null -> {
-                        view.displayHomeMarker(currentHome!!.latLng)
-                        view.moveCamera(currentHome!!.latLng)
-                    }
-                    currentHome == null && permission -> {
-                        view.getLastLocation()?.ifNotNull {
-                            setTemporaryMarker(it.toLatLng())
-                            view.moveCamera(it.toLatLng())
-                        }
+            when {
+                currentHome != null -> {
+                    view?.displayHomeMarker(currentHome!!.latLng)
+                    view?.moveCamera(currentHome!!.latLng)
+                }
+                currentHome == null && permission -> {
+                    view?.getLastLocation()?.ifNotNull {
+                        setTemporaryMarker(it.toLatLng())
+                        view?.moveCamera(it.toLatLng())
                     }
                 }
             }

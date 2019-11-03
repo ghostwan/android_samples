@@ -7,13 +7,16 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.fragment.app.Fragment
 import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.coroutinespermission.PermissionManager
+import com.ghostwan.sample.geofencing.MainApplication
 import com.ghostwan.sample.geofencing.R
+import com.ghostwan.sample.geofencing.ui.BaseContract
+import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.utils.getGoogleMap
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.LocationServices
@@ -32,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KMutableProperty0
 
 
-class MapFragment : Fragment(), MapContract.View, CoroutineScope {
+class MapFragment : BaseFragment(), MapContract.View, CoroutineScope {
 
 
     companion object {
@@ -51,6 +54,10 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
     private val presenter by inject<MapContract.Presenter>()
     private var googleMap: GoogleMap? = null
     private lateinit var root: View
+
+    override fun getPresenter(): BaseContract.BasePresenter {
+        return presenter
+    }
 
     override fun onCreate(p0: Bundle?) {
         super.onCreate(p0)
@@ -126,8 +133,8 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
         radius: Double,
         text: Int,
         icon: Int,
-        strokeColor: Int,
         fillColor: Int,
+        strokeColor: Int,
         pair: KMutableProperty0<out Pair<Marker, Circle>?>
     ) {
 
@@ -140,8 +147,8 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
 
         val circle = googleMap?.addCircle(
             CircleOptions()
-                .strokeColor(context!!.getColor(strokeColor))
                 .fillColor(context!!.getColor(fillColor))
+                .strokeColor(context!!.getColor(strokeColor))
                 .strokeWidth(3f)
                 .center(latLng)
                 .radius(radius)
@@ -157,14 +164,17 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
     }
 
     override fun displayHomeMarker(latLng: LatLng, radius: Double) {
-        displayMarker(
-            latLng, radius,
-            R.string.current_saved_position,
-            R.drawable.home,
-            R.color.areaCurrentHomeStroke,
-            R.color.areaCurrentHomeFill,
-            ::currentHomeMarker
-        )
+        launch {
+            displayMarker(
+                latLng, radius,
+                R.string.current_saved_position,
+                R.drawable.home,
+                if (presenter.isHome()) R.color.homePrimary else R.color.leftPrimary,
+                if (presenter.isHome()) R.color.homePrimaryDark else R.color.leftPrimaryDark,
+                ::currentHomeMarker
+            )
+        }
+
     }
 
     override fun displayTmpMarker(latLng: LatLng, radius: Double) {
@@ -172,8 +182,8 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
             latLng, radius,
             R.string.home_position_question,
             R.drawable.home_tmp,
-            R.color.areaTmpHomeStroke,
-            R.color.areaTmpHomeFill,
+            R.color.tmpPrimary,
+            R.color.tmpPrimaryDark,
             ::currentTmpMarker
         )
     }
@@ -224,11 +234,7 @@ class MapFragment : Fragment(), MapContract.View, CoroutineScope {
     }
 
     fun displayPermissionGranted() {
-        Snackbar.make(
-            root,
-            R.string.permission_granted,
-            Snackbar.LENGTH_SHORT
-        ).show()
+        Log.i(MainApplication.TAG, "location permission granted")
     }
 
     fun displayPermissionRefused() {

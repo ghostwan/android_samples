@@ -6,7 +6,12 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
-    override fun onCreate(){
+
+    companion object {
+        val TAG = "Detect"
+    }
+
+    override fun onCreate() {
         super.onCreate()
         // start Koin!
         startKoin {
