@@ -1,20 +1,23 @@
-package com.ghostwan.sample.geofencing.ui.main
+package com.ghostwan.sample.geofencing.ui.event
 
-import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.Repository
-import kotlinx.coroutines.*
+import com.ghostwan.sample.geofencing.data.Source
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class MainPresenter(private val repository: Repository) :
-    MainContract.Presenter, CoroutineScope {
+class EventPresenter(private val repository: Repository) :
+    EventContract.Presenter, CoroutineScope {
 
-    private var view: MainContract.View? = null
+    private var view: EventContract.View? = null
     private var job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
-    override fun attachView(view: MainContract.View) {
-        if(this.view == null) {
+    override fun attachView(view: EventContract.View) {
+        if (this.view == null) {
             this.view = view
             updateStatus()
         }
@@ -22,7 +25,7 @@ class MainPresenter(private val repository: Repository) :
 
     override fun updateStatus() {
         launch(Main) {
-            if(repository.isHomeValueExist()) {
+            if (repository.isHomeValueExist()) {
                 view?.setIsHome(repository.isHome())
             } else {
                 view?.askIsHome()
@@ -30,7 +33,7 @@ class MainPresenter(private val repository: Repository) :
         }
     }
 
-    override fun detachView(view: MainContract.View) {
+    override fun detachView(view: EventContract.View) {
         if (this.view == view) {
             this.view = null
         }
@@ -38,14 +41,14 @@ class MainPresenter(private val repository: Repository) :
 
     override fun leaveHome(source: Source) {
         launch(Main) {
-            repository.setIsHome( false, source)
+            repository.setIsHome(false, source)
             view?.setIsHome(false)
         }
     }
 
     override fun enterHome(source: Source) {
         launch(Main) {
-            repository.setIsHome( true, source)
+            repository.setIsHome(true, source)
         }
         view?.setIsHome(true)
     }

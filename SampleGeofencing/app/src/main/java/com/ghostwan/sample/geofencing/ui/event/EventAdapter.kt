@@ -1,4 +1,4 @@
-package com.ghostwan.sample.geofencing.ui
+package com.ghostwan.sample.geofencing.ui.event
 
 import android.view.LayoutInflater
 import android.view.View

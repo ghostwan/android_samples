@@ -3,7 +3,7 @@ package com.ghostwan.sample.geofencing.ui.maps
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 
-interface MapsContract {
+interface MapContract {
     interface Presenter {
         fun attachView(view: View)
         fun detachView(view: View)
@@ -11,6 +11,7 @@ interface MapsContract {
         fun saveHomePosition()
         fun clearTmpPosition()
         fun clearSavedPosition()
+        suspend fun isHome(): Boolean
     }
 
     interface View {
@@ -21,6 +22,6 @@ interface MapsContract {
         fun moveCamera(latLng: LatLng)
         suspend fun getLastLocation(): Location?
         fun clearTmpPosition()
-        fun clearSavedPosition()
+        fun clearHomePosition()
     }
 }

@@ -1,28 +1,26 @@
-package com.ghostwan.sample.geofencing.ui.main
+package com.ghostwan.sample.geofencing.ui.event
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
-import com.ghostwan.sample.geofencing.ui.EventAdapter
-import com.ghostwan.sample.geofencing.ui.maps.MapsActivity
-import kotlinx.android.synthetic.main.activity_scrolling.*
-import kotlinx.android.synthetic.main.content_scrolling.*
+import com.ghostwan.sample.geofencing.ui.maps.MapFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.android.ext.android.inject
 
 
-class MainActivity : AppCompatActivity(), MainContract.View {
+class EventFragment : Fragment(), EventContract.View {
 
 
     companion object {
@@ -30,7 +28,7 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         const val MAPS_REQUEST_CODE = 1
     }
 
-    val presenter by inject<MainContract.Presenter>()
+    val presenter by inject<EventContract.Presenter>()
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
@@ -38,14 +36,23 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
     }
 
-    private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(this) }
+    private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
+    private lateinit var root: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scrolling)
-        setSupportActionBar(toolbar)
-        title = ""
+        setHasOptionsMenu(true);
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        root = inflater.inflate(R.layout.fragment_event, container, false)
+        val eventList = root.findViewById<RecyclerView>(R.id.eventList)
 
         viewAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -53,42 +60,52 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             }
         })
 
-        eventList.apply {
+        root.findViewById<RecyclerView>(R.id.eventList).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
         }
-
-
+        return root
     }
 
-    override fun onResume() {
-        super.onResume()
-        registerReceiver(broadcastReceiver, IntentFilter(INTENT_UPDATE_STATUS))
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_event, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_clear_tmp -> presenter.clearDatabase()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        context.registerReceiver(broadcastReceiver, IntentFilter(INTENT_UPDATE_STATUS))
         presenter.attachView(this)
     }
 
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(broadcastReceiver)
+    override fun onDetach() {
+        super.onDetach()
+        context?.unregisterReceiver(broadcastReceiver)
         presenter.detachView(this)
     }
 
     override fun setIsHome(isHome: Boolean) {
+        val fab = root.findViewById<FloatingActionButton>(R.id.fab)
         if (isHome) {
             // If I am home I want to say that I left
-            runOnUiThread {
-                toolbar_layout?.title = getString(R.string.i_am_home)
-                fab.setImageResource(R.drawable.exit_home)
-                fab.setOnClickListener { presenter.leaveHome(Source.App) }
-            }
+            activity?.title = getString(R.string.i_am_home)
+            fab.setImageResource(R.drawable.exit_home)
+            fab.setOnClickListener { presenter.leaveHome(Source.App) }
         } else {
             // If I am not home I want to say that I came
-            runOnUiThread {
-                toolbar_layout?.title = getString(R.string.i_left_home)
-                fab.setImageResource(R.drawable.enter_home)
-                fab.setOnClickListener { presenter.enterHome(Source.App) }
-            }
+            activity?.title = getString(R.string.i_left_home)
+            fab.setImageResource(R.drawable.enter_home)
+            fab.setOnClickListener { presenter.enterHome(Source.App) }
         }
         presenter.refreshEventList()
     }
@@ -101,14 +118,14 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         AlertDialog
             .Builder(
                 ContextThemeWrapper(
-                    this,
+                    context,
                     R.style.AppTheme_NoActionBar
                 )
             )
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
-                openHomeLocationActivity()
+                findNavController().navigate(R.id.navigation_map)
             }
             .setNegativeButton(R.string.no) { dialog, id ->
                 presenter.leaveHome(Source.App)
@@ -117,30 +134,12 @@ class MainActivity : AppCompatActivity(), MainContract.View {
             .show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_clear_tmp -> presenter.clearDatabase()
-            R.id.action_set_home_location -> openHomeLocationActivity()
-            else -> return super.onOptionsItemSelected(item)
-        }
-        return true
-    }
-
-    private fun openHomeLocationActivity() {
-        startActivityForResult(Intent(this, MapsActivity::class.java), MAPS_REQUEST_CODE)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             MAPS_REQUEST_CODE -> data?.let {
                 presenter.setHomeLocation(
-                    data.getLongExtra(MapsActivity.EXTRA_LATITUDE, 0),
-                    data.getLongExtra(MapsActivity.EXTRA_LONGITUDE, 0)
+                    data.getLongExtra(MapFragment.EXTRA_LATITUDE, 0),
+                    data.getLongExtra(MapFragment.EXTRA_LONGITUDE, 0)
                 )
             }
         }

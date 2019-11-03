@@ -1,9 +1,9 @@
-package com.ghostwan.sample.geofencing.ui.main
+package com.ghostwan.sample.geofencing.ui.event
 
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 
-interface MainContract {
+interface EventContract {
     interface Presenter {
         fun attachView(view: View)
         fun detachView(view: View)

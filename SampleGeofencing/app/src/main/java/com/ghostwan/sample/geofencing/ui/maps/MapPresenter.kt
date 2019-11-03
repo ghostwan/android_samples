@@ -13,10 +13,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class MapsPresenter(private val repository: Repository) : MapsContract.Presenter, CoroutineScope {
+class MapPresenter(private val repository: Repository) : MapContract.Presenter, CoroutineScope {
 
 
-    private var view: MapsContract.View? = null
+    private var view: MapContract.View? = null
 
     private var job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -24,7 +24,7 @@ class MapsPresenter(private val repository: Repository) : MapsContract.Presenter
     private var currentHome: Home? = null
     private var currentPosition: LatLng? = null
 
-    override fun attachView(view: MapsContract.View) {
+    override fun attachView(view: MapContract.View) {
         if (this.view == null) {
             this.view = view
             launch(Main) {
@@ -40,7 +40,7 @@ class MapsPresenter(private val repository: Repository) : MapsContract.Presenter
                     }
                     currentHome == null && permission -> {
                         view.getLastLocation()?.ifNotNull {
-                            view.displayTmpMarker(it.toLatLng())
+                            setTemporaryMarker(it.toLatLng())
                             view.moveCamera(it.toLatLng())
                         }
                     }
@@ -49,7 +49,7 @@ class MapsPresenter(private val repository: Repository) : MapsContract.Presenter
         }
     }
 
-    override fun detachView(view: MapsContract.View) {
+    override fun detachView(view: MapContract.View) {
         this.view = null
     }
 
@@ -59,16 +59,22 @@ class MapsPresenter(private val repository: Repository) : MapsContract.Presenter
     }
 
     override fun saveHomePosition() {
-        launch {
+        launch(Main) {
             currentPosition?.ifNotNull { position ->
                 currentHome?.ifNotNull { home ->
                     home.latLng = position
                     repository.saveHomeData(home)
                 } ?: elseNull {
-                    repository.createHome(position)
+                    currentHome = repository.createHome(position)
                 }
+                view?.clearTmpPosition()
+                view?.displayHomeMarker(currentHome!!.latLng)
             }
         }
+    }
+
+    override suspend fun isHome(): Boolean {
+        return repository.isHome()
     }
 
     override fun clearTmpPosition() {
@@ -82,7 +88,7 @@ class MapsPresenter(private val repository: Repository) : MapsContract.Presenter
             currentHome?.ifNotNull {
                 repository.deleteHome(it)
                 currentHome = null
-                view?.clearSavedPosition()
+                view?.clearHomePosition()
             }
         }
     }

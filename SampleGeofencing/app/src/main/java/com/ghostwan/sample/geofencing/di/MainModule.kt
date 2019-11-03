@@ -4,28 +4,28 @@ import androidx.room.Room
 import com.ghostwan.sample.geofencing.data.Database
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.RoomRepository
-import com.ghostwan.sample.geofencing.ui.main.MainContract
-import com.ghostwan.sample.geofencing.ui.main.MainPresenter
-import com.ghostwan.sample.geofencing.ui.maps.MapsContract
-import com.ghostwan.sample.geofencing.ui.maps.MapsPresenter
+import com.ghostwan.sample.geofencing.ui.event.EventContract
+import com.ghostwan.sample.geofencing.ui.event.EventPresenter
+import com.ghostwan.sample.geofencing.ui.maps.MapContract
+import com.ghostwan.sample.geofencing.ui.maps.MapPresenter
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val mainModule = module {
     single<Repository> { RoomRepository(get(), get()) }
-    factory<MainContract.Presenter> {
-        MainPresenter(
+    factory<EventContract.Presenter> {
+        EventPresenter(
             get()
         )
     }
-    factory<MapsContract.Presenter> {
-        MapsPresenter(
+    factory<MapContract.Presenter> {
+        MapPresenter(
             get()
         )
     }
     single {
         Room.databaseBuilder(androidApplication(), Database::class.java, "event-db")
-        .build()
+            .build()
     }
     single { get<Database>().eventDao() }
     single { get<Database>().homeDao() }
