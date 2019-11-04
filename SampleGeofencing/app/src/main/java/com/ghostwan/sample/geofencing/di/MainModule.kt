@@ -2,6 +2,7 @@ package com.ghostwan.sample.geofencing.di
 
 import androidx.room.Room
 import com.ghostwan.sample.geofencing.data.Database
+import com.ghostwan.sample.geofencing.data.HomeManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.RoomRepository
 import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
@@ -33,6 +34,7 @@ val mainModule = module {
     single { get<Database>().homeDao() }
     single { GeofencingManager(get()) }
     single { NotificationManager(get()) }
+    single { HomeManager() }
 
 }
 

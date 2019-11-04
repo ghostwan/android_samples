@@ -5,5 +5,9 @@ import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 
 @Entity
-data class Home(var latLng: LatLng,
-                @PrimaryKey(autoGenerate = true) val id:Long?=null)
+data class Home(
+    var latLng: LatLng,
+    var isGeofencingRegistered: Boolean,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long? = null
+)

@@ -31,4 +31,5 @@
     <string name="no_home_set">No home set</string>
     <string name="geofecing_registration">Geofencing registration</string>
     <string name="geofecing">Geofencing</string>
+    <string name="geofecing_already_registered">Geofencing already registered</string>
 </resources>

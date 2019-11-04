@@ -12,7 +12,7 @@ import com.ghostwan.sample.geofencing.utils.ifNotNull
 class NotificationManager(val context: Context) {
 
     private val notificationManager: NotificationManager by lazy { context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
-    val geoFencingChannel by lazy {
+    private val geoFencingChannel: NotificationChannel by lazy {
         createChannel("Detect Geofencing", NotificationManager.IMPORTANCE_HIGH)
         notificationManager.notificationChannels[0]
     }

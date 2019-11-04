@@ -93,9 +93,8 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
 
         launch(Main) {
             currentHome?.ifNotNull {
-                repository.deleteHome(it)
-                currentHome = null
                 view?.clearHomePosition()
+                currentHome = null
             }
         }
     }

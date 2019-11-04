@@ -3,15 +3,15 @@ package com.ghostwan.sample.geofencing
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
+import com.ghostwan.sample.geofencing.data.HomeManager
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 class StartUpBootReceiver : BroadcastReceiver(), KoinComponent {
 
-    private val geofencingManager by inject<GeofencingManager>()
+    private val homeManager by inject<HomeManager>()
 
     override fun onReceive(context: Context, intent: Intent) {
-        geofencingManager.registerGeofencing()
+        homeManager.forceGeofencingRegistration()
     }
 }

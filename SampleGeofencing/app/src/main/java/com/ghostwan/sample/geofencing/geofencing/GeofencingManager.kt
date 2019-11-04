@@ -26,35 +26,42 @@ import kotlin.coroutines.CoroutineContext
 class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
 
     private val geofencingClient: GeofencingClient by lazy { LocationServices.getGeofencingClient(context) }
-    private var isRegistered = false
     private val repository by inject<Repository>()
     private val notificationManager by inject<NotificationManager>()
 
     private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.Main
+    override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
         PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    fun registerGeofencing() {
-        if (isRegistered) {
-            Log.w(TAG, "Geofencing already registered! ")
-            return
-        }
-        clearGeofencing()
+    suspend fun getHome(): Home? {
+        return repository.getHomeData()
+    }
+
+    fun registerGeofencing(force: Boolean = false) {
         launch {
-            repository.getHomeData()?.ifNotNull {
-                geofencingClient.addGeofences(getGeofencingRequest(it), geofencePendingIntent)?.run {
+            getHome()?.ifNotNull { home ->
+                if (home.isGeofencingRegistered && !force) {
+                    Log.w(TAG, "Geofencing already registered! ")
+                    notificationManager.display(R.string.geofecing_registration, R.string.geofecing_already_registered)
+                    return@launch
+                }
+                clearGeofencing()
+                geofencingClient.addGeofences(getGeofencingRequest(home), geofencePendingIntent)?.run {
                     addOnSuccessListener {
                         Log.i(TAG, "Geofecing successfully added!")
-                        isRegistered = true
-                        notificationManager.display(R.string.geofecing_registration, R.string.geofencing_added_succeed)
+                        setGeofencingRegistration(home, true)
+                        notificationManager.display(
+                            R.string.geofecing_registration,
+                            R.string.geofencing_added_succeed
+                        )
                     }
                     addOnFailureListener {
                         Log.e(TAG, "Geofencing added failed ", it)
-                        isRegistered = false
+                        setGeofencingRegistration(home, false)
                         notificationManager.display(
                             R.string.geofecing_registration,
                             R.string.geofencing_added_failed,
@@ -63,7 +70,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                     }
                     addOnCanceledListener {
                         Log.w(TAG, "Geofencing cancelled ")
-                        isRegistered = false
+                        setGeofencingRegistration(home, false)
                         notificationManager.display(R.string.geofecing_registration, R.string.geofencing_cancelled)
                     }
                 }
@@ -74,9 +81,18 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
 
     }
 
-    fun clearGeofencing() {
-        geofencingClient.removeGeofences(geofencePendingIntent)
-        isRegistered = false
+    private fun setGeofencingRegistration(home: Home, value: Boolean) {
+        launch {
+            home.isGeofencingRegistered = value
+            repository.saveHomeData(home)
+        }
+    }
+
+    suspend fun clearGeofencing() {
+        getHome()?.ifNotNull {
+            geofencingClient.removeGeofences(geofencePendingIntent)
+            setGeofencingRegistration(it, false)
+        }
     }
 
     private fun getGeofencingRequest(home: Home): GeofencingRequest {

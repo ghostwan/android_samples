@@ -13,5 +13,5 @@ interface Repository {
     suspend fun getHomeData(id: Long? = null): Home?
     suspend fun saveHomeData(home: Home)
     suspend fun createHome(latLng: LatLng): Home
-    suspend fun deleteHome(home: Home)
+    suspend fun deleteHome(home: Home? = null)
 }

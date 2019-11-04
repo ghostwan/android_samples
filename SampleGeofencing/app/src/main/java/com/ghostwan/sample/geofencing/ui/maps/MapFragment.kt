@@ -15,7 +15,7 @@ import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.coroutinespermission.PermissionManager
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
-import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
+import com.ghostwan.sample.geofencing.data.HomeManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.utils.elseNull
@@ -42,7 +42,7 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     private val mapFragment by lazy { childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment }
-    private val geofencingManager by inject<GeofencingManager>()
+    private val homeManager by inject<HomeManager>()
 
     var currentHomeMarker: Pair<Marker, Circle>? = null
     var currentTmpMarker: Pair<Marker, Circle>? = null
@@ -198,8 +198,8 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     override fun clearHomePosition() {
+        homeManager.deleteHome()
         clearPosition(::currentHomeMarker)
-        geofencingManager.clearGeofencing()
         message(R.string.geofencing_added_removed)
     }
 
@@ -278,6 +278,6 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     override fun registerGeofencing() {
-        geofencingManager.registerGeofencing()
+        homeManager.forceGeofencingRegistration()
     }
 }

@@ -4,6 +4,8 @@ import com.ghostwan.sample.geofencing.data.dao.EventDao
 import com.ghostwan.sample.geofencing.data.dao.HomeDao
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
+import com.ghostwan.sample.geofencing.utils.elseNull
+import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.maps.model.LatLng
 
 class RoomRepository(
@@ -47,13 +49,17 @@ class RoomRepository(
     }
 
     override suspend fun createHome(latLng: LatLng): Home {
-        val home = Home(latLng)
+        val home = Home(latLng, false)
         homeDao.insert(home)
         return home
     }
 
-    override suspend fun deleteHome(home: Home) {
-        homeDao.delete(home)
+    override suspend fun deleteHome(home: Home?) {
+        home?.ifNotNull {
+            homeDao.delete(it)
+        } ?: elseNull {
+            homeDao.deleteAll()
+        }
     }
 
 }
