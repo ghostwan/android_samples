@@ -48,8 +48,8 @@ class RoomRepository(
         homeDao.update(home)
     }
 
-    override suspend fun createHome(latLng: LatLng): Home {
-        val home = Home(latLng, false)
+    override suspend fun createHome(latLng: LatLng, radius: Double, initialTrigger: Int): Home {
+        val home = Home(latLng, false, radius, initialTrigger)
         homeDao.insert(home)
         return home
     }

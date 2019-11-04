@@ -12,6 +12,6 @@ interface Repository {
     suspend fun clearEvents()
     suspend fun getHomeData(id: Long? = null): Home?
     suspend fun saveHomeData(home: Home)
-    suspend fun createHome(latLng: LatLng): Home
+    suspend fun createHome(latLng: LatLng, radius: Double, initialTrigger: Int): Home
     suspend fun deleteHome(home: Home? = null)
 }

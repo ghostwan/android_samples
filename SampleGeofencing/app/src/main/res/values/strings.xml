@@ -32,4 +32,11 @@
     <string name="geofecing_registration">Geofencing registration</string>
     <string name="geofecing">Geofencing</string>
     <string name="geofecing_already_registered">Geofencing already registered</string>
+    <string name="changing_radius_message">Choose radius in meters:</string>
+    <string name="changing_radius_title">Set geofencing radius</string>
+    <string name="changing_initial_trigger_title">Set geofencing initial trigger</string>
+    <string name="changing_initial_trigger_message">Sets the geofence notification behavior at the moment when geofence is added</string>
+    <string name="changing_initial_trigger_current">Current is: </string>
+    <string name="initial_trigger_enter">When already inside</string>
+    <string name="initial_trigger_exit">When already outside</string>
 </resources>

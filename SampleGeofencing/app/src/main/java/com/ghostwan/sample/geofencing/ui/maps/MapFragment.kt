@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.*
+import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import com.eazypermissions.common.model.PermissionResult
@@ -21,6 +22,8 @@ import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.getGoogleMap
 import com.ghostwan.sample.geofencing.utils.ifNotNull
+import com.google.android.gms.location.GeofencingRequest.INITIAL_TRIGGER_ENTER
+import com.google.android.gms.location.GeofencingRequest.INITIAL_TRIGGER_EXIT
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -42,6 +45,7 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     private val mapFragment by lazy { childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment }
+
     private val homeManager by inject<HomeManager>()
 
     var currentHomeMarker: Pair<Marker, Circle>? = null
@@ -94,6 +98,8 @@ class MapFragment : BaseFragment(), MapContract.View {
             }
             R.id.action_clear_tmp -> presenter.clearTmpPosition()
             R.id.action_clear_current -> presenter.clearSavedPosition()
+            R.id.action_set_radius -> presenter.askRadius()
+            R.id.action_set_geofencing_initial -> presenter.askInitialTrigger()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -213,7 +219,6 @@ class MapFragment : BaseFragment(), MapContract.View {
         return LocationServices.getFusedLocationProviderClient(ctx).lastLocation.await()
     }
 
-
     override suspend fun prepareMap(hasPermission: Boolean) {
         googleMap = mapFragment.getGoogleMap()
         if (hasPermission) {
@@ -280,4 +285,46 @@ class MapFragment : BaseFragment(), MapContract.View {
     override fun registerGeofencing() {
         homeManager.forceGeofencingRegistration()
     }
+
+    override fun displayNumberPicker(initialValue: Int) {
+        val numberPicker = NumberPicker(context!!)
+        numberPicker.maxValue = 300
+        numberPicker.minValue = 5
+        numberPicker.value = initialValue
+
+
+        val builder = AlertDialog.Builder(context!!)
+        builder.setView(numberPicker)
+        builder.setTitle(R.string.changing_radius_title)
+        builder.setMessage(R.string.changing_radius_message)
+        builder.setPositiveButton(
+            "OK"
+        ) { dialog, which -> presenter.setRadius(numberPicker.value) }
+        builder.setNegativeButton(
+            "CANCEL"
+        ) { dialog, which -> dialog.dismiss() }
+        builder.create().show()
+    }
+
+    override fun displayInitialTriggerChooser(currentTrigger: Int) {
+
+        val message: String = "${getString(R.string.changing_initial_trigger_message)}. " +
+                "${getString(R.string.changing_initial_trigger_current)} " +
+                if (currentTrigger == INITIAL_TRIGGER_ENTER)
+                    "${getString(R.string.initial_trigger_enter)} "
+                else
+                    "${getString(R.string.initial_trigger_exit)} "
+
+        val builder = AlertDialog.Builder(context!!)
+        builder.setTitle(R.string.changing_initial_trigger_title)
+        builder.setMessage(message)
+        builder.setPositiveButton(
+            R.string.initial_trigger_enter
+        ) { dialog, which -> presenter.setInitialTrigger(INITIAL_TRIGGER_ENTER) }
+        builder.setNegativeButton(
+            R.string.initial_trigger_exit
+        ) { dialog, which -> presenter.setInitialTrigger(INITIAL_TRIGGER_EXIT) }
+        builder.create().show()
+    }
+
 }

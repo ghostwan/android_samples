@@ -6,6 +6,15 @@
         android:title="@string/clear_saved_location"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_set_radius"
+        android:title="@string/changing_radius_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_set_geofencing_initial"
+        android:title="@string/changing_initial_trigger_title"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_clear_tmp"
         android:icon="@drawable/ic_remove"
         android:title="@string/clear_location"

@@ -14,19 +14,31 @@ class EventAdapter : ListAdapter<Event, EventAdapter.Holder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.event_row, parent, false)
-        return Holder(view)
+        return Holder(
+            view,
+            parent.context.getColor(R.color.homeText),
+            parent.context.getColor(R.color.leftText)
+        )
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class Holder(row: View) : RecyclerView.ViewHolder(row) {
+    class Holder(row: View, private val homeColor: Int, private val leftColor: Int) : RecyclerView.ViewHolder(row) {
+
         fun bind(event: Event) {
             itemView.event_date.text = event.date.toString()
-            itemView.event_state.setText(event.isHome.let {
-                if (it) R.string.i_am_home else R.string.i_left_home
-            })
+            event.isHome.let {
+                if (it) {
+                    itemView.event_state.setText(R.string.i_am_home)
+                    itemView.event_state.setTextColor(homeColor)
+                } else {
+                    itemView.event_state.setText(R.string.i_left_home)
+                    itemView.event_state.setTextColor(leftColor)
+                }
+
+            }
             itemView.event_source.text = event.source.name
             itemView.setOnClickListener { }
         }

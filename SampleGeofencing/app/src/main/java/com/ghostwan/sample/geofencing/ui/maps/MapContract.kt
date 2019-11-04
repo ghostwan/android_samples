@@ -13,6 +13,10 @@ interface MapContract {
         fun clearTmpPosition()
         fun clearSavedPosition()
         suspend fun isHome(): Boolean
+        fun setRadius(radius: Int)
+        fun askRadius()
+        fun setInitialTrigger(initialTrigger: Int)
+        fun askInitialTrigger()
     }
 
     interface View {
@@ -25,5 +29,7 @@ interface MapContract {
         fun clearTmpPosition()
         fun clearHomePosition()
         fun registerGeofencing()
+        fun displayNumberPicker(initialValue: Int)
+        fun displayInitialTriggerChooser(currentTrigger: Int)
     }
 }

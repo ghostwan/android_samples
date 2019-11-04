@@ -8,7 +8,6 @@ import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.model.Home
-import com.ghostwan.sample.geofencing.ui.maps.MapPresenter
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.Geofence
@@ -103,7 +102,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                 .setCircularRegion(
                     home.latLng.latitude,
                     home.latLng.longitude,
-                    MapPresenter.DEFAULT_RADIUS.toFloat()
+                    home.radius.toFloat()
                 )
                 .setTransitionTypes(
                     Geofence.GEOFENCE_TRANSITION_ENTER or
@@ -116,11 +115,12 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
         Log.i(
             TAG, "Add coordinates for Latitude: ${home.latLng.latitude} " +
                     "Longitude: ${home.latLng.longitude} " +
-                    "Radius ${MapPresenter.DEFAULT_RADIUS.toFloat()} "
+                    "Radius ${home.radius.toFloat()} "
         )
         return GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT)
+            setInitialTrigger(home.initialTrigger)
             addGeofences(geofenceList)
         }.build()
     }
+
 }

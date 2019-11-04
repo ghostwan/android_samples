@@ -8,6 +8,8 @@ import com.google.android.gms.maps.model.LatLng
 data class Home(
     var latLng: LatLng,
     var isGeofencingRegistered: Boolean,
+    var radius: Double,
+    var initialTrigger: Int,
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null
 )
