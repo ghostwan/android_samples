@@ -2,11 +2,8 @@ package com.ghostwan.sample.geofencing.ui.event
 
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.Source
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class EventPresenter(private val repository: Repository) :
@@ -24,11 +21,16 @@ class EventPresenter(private val repository: Repository) :
     }
 
     override fun updateStatus() {
-        launch(Main) {
+        launch {
             if (repository.isHomeValueExist()) {
-                view?.setIsHome(repository.isHome())
+                val isHome = repository.isHome()
+                withContext(Main) {
+                    view?.setIsHome(isHome)
+                }
             } else {
-                view?.askIsHome()
+                withContext(Main) {
+                    view?.askIsHome()
+                }
             }
         }
     }
@@ -40,30 +42,39 @@ class EventPresenter(private val repository: Repository) :
     }
 
     override fun leaveHome(source: Source) {
-        launch(Main) {
+        launch {
             repository.setIsHome(false, source)
-            view?.setIsHome(false)
+            withContext(Main) {
+                view?.setIsHome(false)
+            }
         }
     }
 
     override fun enterHome(source: Source) {
-        launch(Main) {
+        launch {
             repository.setIsHome(true, source)
+            withContext(Main) {
+                view?.setIsHome(true)
+            }
         }
-        view?.setIsHome(true)
     }
 
     override fun refreshEventList() {
-        launch(Main) {
-            view?.showEventList(repository.getEvents())
+        launch {
+            val events = repository.getEvents()
+            withContext(Main) {
+                view?.showEventList(events)
+            }
         }
     }
 
     override fun clearDatabase() {
-        launch(Main) {
+        launch {
             repository.clearEvents()
-            view?.showEventList(ArrayList())
-            view?.askIsHome()
+            withContext(Main) {
+                view?.showEventList(ArrayList())
+                view?.askIsHome()
+            }
         }
     }
 

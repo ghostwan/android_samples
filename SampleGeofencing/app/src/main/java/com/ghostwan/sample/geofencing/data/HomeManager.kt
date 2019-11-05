@@ -12,7 +12,7 @@ import kotlin.coroutines.CoroutineContext
 class HomeManager : KoinComponent, CoroutineScope {
 
     private val job = Job()
-    override val coroutineContext: CoroutineContext = job + Dispatchers.Main
+    override val coroutineContext: CoroutineContext = job + Dispatchers.IO
     private val repository by inject<Repository>()
     private val geofencingManager by inject<GeofencingManager>()
 

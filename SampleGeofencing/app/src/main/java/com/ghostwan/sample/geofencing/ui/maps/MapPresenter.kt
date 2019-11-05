@@ -7,11 +7,8 @@ import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.ghostwan.sample.geofencing.utils.toLatLng
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class MapPresenter(private val repository: Repository) : MapContract.Presenter, CoroutineScope {
@@ -40,24 +37,32 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     }
 
     override fun updateStatus() {
-        launch(Main) {
+        launch {
             currentHome = repository.getHomeData()
-            val permission = view?.checkAndAskPermissions() ?: false
-            view?.prepareMap(permission)
+
+            var permission = false
+            withContext(Main) {
+                permission = view?.checkAndAskPermissions() ?: false
+                view?.prepareMap(permission)
+            }
 
             when {
                 currentHome != null -> {
                     val home = currentHome!!
                     radius = home.radius
                     initialTrigger = home.initialTrigger
-                    view?.displayHomeMarker(home.latLng, radius)
-                    view?.moveCamera(home.latLng)
+                    withContext(Main) {
+                        view?.displayHomeMarker(home.latLng, radius)
+                        view?.moveCamera(home.latLng)
+                    }
                 }
                 currentHome == null && permission -> {
-                    radius = view?.getLastLocation()?.accuracy?.toDouble() ?: DEFAULT_RADIUS
-                    view?.getLastLocation()?.ifNotNull {
-                        setTemporaryMarker(it.toLatLng())
-                        view?.moveCamera(it.toLatLng())
+                    withContext(Main) {
+                        radius = view?.getLastLocation()?.accuracy?.toDouble() ?: DEFAULT_RADIUS
+                        view?.getLastLocation()?.ifNotNull {
+                            setTemporaryMarker(it.toLatLng())
+                            view?.moveCamera(it.toLatLng())
+                        }
                     }
                 }
             }
@@ -74,7 +79,7 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     }
 
     override fun saveHomePosition() {
-        launch(Main) {
+        launch {
             currentPosition?.ifNotNull { position ->
                 currentHome?.ifNotNull { home ->
                     home.latLng = position
@@ -84,9 +89,11 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
                 } ?: elseNull {
                     currentHome = repository.createHome(position, radius, initialTrigger)
                 }
-                view?.clearTmpPosition()
-                view?.displayHomeMarker(currentHome!!.latLng, radius)
-                view?.registerGeofencing()
+                withContext(Main) {
+                    view?.clearTmpPosition()
+                    view?.displayHomeMarker(currentHome!!.latLng, radius)
+                    view?.registerGeofencing()
+                }
             }
         }
     }
@@ -102,9 +109,11 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
 
     override fun clearSavedPosition() {
 
-        launch(Main) {
+        launch {
             currentHome?.ifNotNull {
-                view?.clearHomePosition()
+                withContext(Main) {
+                    view?.clearHomePosition()
+                }
                 currentHome = null
             }
         }

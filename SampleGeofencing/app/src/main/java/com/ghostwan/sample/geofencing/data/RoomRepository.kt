@@ -4,6 +4,7 @@ import com.ghostwan.sample.geofencing.data.dao.EventDao
 import com.ghostwan.sample.geofencing.data.dao.HomeDao
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
+import com.ghostwan.sample.geofencing.utils.Analytics
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.maps.model.LatLng
@@ -19,7 +20,9 @@ class RoomRepository(
     }
 
     override suspend fun setIsHome(value: Boolean, source: Source) {
-        eventDao.insert(Event(value, source))
+        val event = Event(value, source)
+        Analytics.v1.sendEvent(event, getHomeData())
+        eventDao.insert(event)
     }
 
     override suspend fun isHome(): Boolean {

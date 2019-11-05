@@ -26,7 +26,7 @@ class EventFragment : BaseFragment(), EventContract.View {
         const val MAPS_REQUEST_CODE = 1
     }
 
-    val presenter by inject<EventContract.Presenter>()
+    private val presenter by inject<EventContract.Presenter>()
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
