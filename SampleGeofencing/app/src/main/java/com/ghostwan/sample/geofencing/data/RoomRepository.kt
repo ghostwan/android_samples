@@ -11,7 +11,8 @@ import com.google.android.gms.maps.model.LatLng
 
 class RoomRepository(
     private val eventDao: EventDao,
-    private val homeDao: HomeDao
+    private val homeDao: HomeDao,
+    private val analytics: Analytics
 ) : Repository {
 
 
@@ -21,7 +22,7 @@ class RoomRepository(
 
     override suspend fun setIsHome(value: Boolean, source: Source) {
         val event = Event(value, source)
-        Analytics.v1.sendEvent(event, getHomeData())
+        analytics.sendEvent(event, getHomeData())
         eventDao.insert(event)
     }
 
