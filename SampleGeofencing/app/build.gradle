@@ -4,6 +4,9 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
 apply plugin: 'io.fabric'
 
+// For the google services copy the google-services.json file that you can found :
+// https://console.firebase.google.com/project/level-prism-257420/settings/general/android:com.ghostwan.sample.geofencing
+// in the app folder
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -11,7 +14,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // Go to https://console.developers.google.com/apis/credentials?project=level-prism-257420 to retrieve the Google API key
@@ -19,9 +22,12 @@ android {
         // GOOGLE_MAP_KEY=AIz....
         //
         // Note that the API key is linked to the encryption key used to sign the APK.
-        // You need a different API key for each encryption key,
+        // You can either add a different API key for each encryption key,
         // including the release key that is used to sign the APK for publishing.
         // You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        // Or add you current key in your API restriction
+        // To get your debug keystore hash, SHA1:
+        // keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
         //
         resValue "string", "GOOGLE_MAP_KEY", "${getLocalProperty('GOOGLE_MAP_KEY')}"
     }
