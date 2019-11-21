@@ -11,12 +11,12 @@ import com.ghostwan.sample.geofencing.ui.event.EventContract
 import com.ghostwan.sample.geofencing.ui.event.EventPresenter
 import com.ghostwan.sample.geofencing.ui.maps.MapContract
 import com.ghostwan.sample.geofencing.ui.maps.MapPresenter
-import com.ghostwan.sample.geofencing.utils.Analytics
+import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val mainModule = module {
-    single { Analytics(get()) }
+    single { AnalyticsManager(get()) }
     single<Repository> { RoomRepository(get(), get(), get()) }
     factory<EventContract.Presenter> {
         EventPresenter(
