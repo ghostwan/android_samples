@@ -60,4 +60,10 @@ class IAHomeTileService : TileService(), EventContract.View {
     override fun showEventList(events: List<Event>) {
     }
 
+    override fun askToLogin() {
+    }
+
+    override fun logout() {
+    }
+
 }
