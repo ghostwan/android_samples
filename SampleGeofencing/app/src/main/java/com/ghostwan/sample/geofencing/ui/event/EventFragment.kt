@@ -30,11 +30,11 @@ class EventFragment : BaseFragment(), EventContract.View {
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
-    private lateinit var root: View
+    private var root: View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(true)
     }
 
     override fun getPresenter(): BaseContract.BasePresenter {
@@ -48,7 +48,7 @@ class EventFragment : BaseFragment(), EventContract.View {
     ): View? {
 
         root = inflater.inflate(R.layout.fragment_event, container, false)
-        val eventList = root.findViewById<RecyclerView>(R.id.eventList)
+        val eventList = root?.findViewById<RecyclerView>(R.id.eventList)
 
         viewAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -56,7 +56,7 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
         })
 
-        root.findViewById<RecyclerView>(R.id.eventList).apply {
+        root?.findViewById<RecyclerView>(R.id.eventList)?.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
@@ -89,19 +89,19 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     override fun setIsHome(isHome: Boolean) {
-        val fab = root.findViewById<FloatingActionButton>(R.id.fab)
+        val fab = root?.findViewById<FloatingActionButton>(R.id.fab)
         if (isHome) {
             // If I am home I want to say that I left
             activity?.title = getString(R.string.i_am_home)
-            fab.setImageResource(R.drawable.exit_home)
-            fab.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.leftTint))
-            fab.setOnClickListener { presenter.leaveHome(Source.App) }
+            fab?.setImageResource(R.drawable.exit_home)
+            fab?.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.leftTint))
+            fab?.setOnClickListener { presenter.leaveHome(Source.App) }
         } else {
             // If I am not home I want to say that I came
             activity?.title = getString(R.string.i_left_home)
-            fab.setImageResource(R.drawable.enter_home)
-            fab.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.homeTint))
-            fab.setOnClickListener { presenter.enterHome(Source.App) }
+            fab?.setImageResource(R.drawable.enter_home)
+            fab?.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.homeTint))
+            fab?.setOnClickListener { presenter.enterHome(Source.App) }
         }
         presenter.refreshEventList()
     }
