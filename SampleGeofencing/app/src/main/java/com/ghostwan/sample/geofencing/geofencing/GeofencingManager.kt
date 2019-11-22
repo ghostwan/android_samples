@@ -8,7 +8,7 @@ import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.model.Home
-import com.ghostwan.sample.geofencing.utils.Analytics
+import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.Geofence
@@ -28,7 +28,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
     private val geofencingClient: GeofencingClient by lazy { LocationServices.getGeofencingClient(context) }
     private val repository by inject<Repository>()
     private val notificationManager by inject<NotificationManager>()
-    private val analytics by inject<Analytics>()
+    private val analyticsManager by inject<AnalyticsManager>()
 
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -48,7 +48,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                 if (home.isGeofencingRegistered && !force) {
                     Log.w(TAG, "Geofencing already registered! ")
                     notificationManager.display(R.string.geofecing_registration, R.string.geofecing_already_registered)
-                    analytics.alreadyRegister()
+                    analyticsManager.alreadyRegister()
                     return@launch
                 }
                 clearGeofencing()
@@ -60,7 +60,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                             R.string.geofecing_registration,
                             R.string.geofencing_added_succeed
                         )
-                        analytics.registerGeofencingSucceed()
+                        analyticsManager.registerGeofencingSucceed()
                     }
                     addOnFailureListener {
                         Log.e(TAG, "Geofencing added failed ", it)
@@ -70,13 +70,13 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                             R.string.geofencing_added_failed,
                             it.localizedMessage
                         )
-                        analytics.registerGeofencingFailed(it)
+                        analyticsManager.registerGeofencingFailed(it)
                     }
                     addOnCanceledListener {
                         Log.w(TAG, "Geofencing cancelled ")
                         setGeofencingRegistration(home, false)
                         notificationManager.display(R.string.geofecing_registration, R.string.geofencing_cancelled)
-                        analytics.registerGeofencingCanceled()
+                        analyticsManager.registerGeofencingCanceled()
                     }
                 }
             } ?: elseNull {

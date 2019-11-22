@@ -1,0 +1,14 @@
+{
+    "users" : {
+        "1" : { 
+            "name" : "erwan", 
+        },
+        "2" : { "name" : "yi"}
+    },
+
+    "events" : {
+        "1" : { "date" : 123456689, "source" : "geofencing", "event": "left", "radius" : 30, "trigger" : "exit" },
+        "2" : { "date" : 123456712, "source" : "geofencing", "event": "come", "radius" : 30, "trigger" : "exit" },
+        "3" : { "date" : 123456812, "source" : "tile", "event": "left" }
+    }
+}

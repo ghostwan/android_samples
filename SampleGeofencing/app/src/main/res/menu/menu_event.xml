@@ -4,4 +4,8 @@
         android:id="@+id/action_clear_tmp"
         android:title="@string/action_clear"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_authenticate"
+        android:title="@string/action_authenticate"
+        app:showAsAction="never" />
 </menu>

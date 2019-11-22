@@ -1,12 +1,13 @@
 package com.ghostwan.sample.geofencing.ui.event
 
+import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.Source
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 
-class EventPresenter(private val repository: Repository) :
+class EventPresenter(private val repository: Repository, private val preferenceManager: PreferenceManager) :
     EventContract.Presenter, CoroutineScope {
 
     private var view: EventContract.View? = null
@@ -22,6 +23,11 @@ class EventPresenter(private val repository: Repository) :
 
     override fun updateStatus() {
         launch {
+            if (!preferenceManager.isPreferenceAuthenticatedExist()) {
+                withContext(Main) {
+                    view?.askToLogin()
+                }
+            }
             if (repository.isHomeValueExist()) {
                 val isHome = repository.isHome()
                 withContext(Main) {

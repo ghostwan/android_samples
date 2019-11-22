@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">> Detect</string>
     <string name="action_settings">Settings</string>
-    <string name="action_clear">Clear event database</string>
+    <string name="action_clear">Clear events</string>
+    <string name="action_authenticate">Server authentication</string>
     <string name="clear_saved_location">Clear saved location</string>
     <string name="save_location">Save location</string>
     <string name="clear_location">Clear location</string>
     <string name="are_you_home">Are you home ?</string>
+    <string name="authenticate_logout">If you logout data won\'t be send to the server anymore</string>
+    <string name="authenticate_signup">To be able to store events on the server directly single sign up. If you say no, data will stay locally on your phone</string>
     <string name="i_am_home">I am home</string>
     <string name="come_home">Come home</string>
     <string name="leave_home">Leave home</string>
@@ -13,6 +16,7 @@
     <string name="no_history_yet">No history yet!</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
     <string name="title_activity_maps">Map</string>
     <string name="select_home_location">Select home location</string>
     <string name="permission_granted">Location permission granted: looking for current position</string>
@@ -39,4 +43,6 @@
     <string name="changing_initial_trigger_current">Current is: </string>
     <string name="initial_trigger_enter">When already inside</string>
     <string name="initial_trigger_exit">When already outside</string>
+    <string name="authentication_succeed">Authentication succeed</string>
+    <string name="logout">Logout from server</string>
 </resources>

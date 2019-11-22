@@ -1,20 +1,20 @@
-package com.ghostwan.sample.geofencing.utils
+package com.ghostwan.sample.geofencing.analytics
 
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
+import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.GeofencingRequest
 import com.google.firebase.analytics.FirebaseAnalytics
 import java.util.*
 
-
-class Analytics(val context: Context) {
+class FirebaseAnalytics(val context: Context) : AnalyticsProviderContract {
 
     private var firebaseAnalytics: FirebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
-    fun getDataBundle(): Bundle {
+    private fun getDataBundle(): Bundle {
         val bundle = Bundle()
         bundle.putString("manufacturer", Build.MANUFACTURER)
         bundle.putString("model", Build.MODEL)
@@ -24,7 +24,7 @@ class Analytics(val context: Context) {
         return bundle
     }
 
-    fun sendEvent(event: Event, home: Home?) {
+    override fun sendEvent(event: Event, home: Home?) {
         var firebaseEvent = if (event.isHome) "come_home" else "left_home"
         firebaseEvent += "_${event.source.name}"
 
@@ -42,21 +42,21 @@ class Analytics(val context: Context) {
         firebaseAnalytics.logEvent(firebaseEvent, bundle)
     }
 
-    fun alreadyRegister() {
+    override fun alreadyRegister() {
         firebaseAnalytics.logEvent("geofence_already_register", getDataBundle())
     }
 
-    fun registerGeofencingSucceed() {
+    override fun registerGeofencingSucceed() {
         firebaseAnalytics.logEvent("geofence_register_succeed", getDataBundle())
     }
 
-    fun registerGeofencingFailed(exception: Exception) {
+    override fun registerGeofencingFailed(exception: Exception) {
         firebaseAnalytics.logEvent("geofence_register_failed", getDataBundle().apply {
             putString("error_message", exception.message)
         })
     }
 
-    fun registerGeofencingCanceled() {
+    override fun registerGeofencingCanceled() {
         firebaseAnalytics.logEvent("geofence_register_canceled", getDataBundle())
     }
 }

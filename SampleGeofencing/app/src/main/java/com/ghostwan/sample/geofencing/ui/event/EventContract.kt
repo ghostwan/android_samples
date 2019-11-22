@@ -19,6 +19,8 @@ interface EventContract {
         fun setIsHome(isHome: Boolean)
         fun askIsHome()
         fun showEventList(events: List<Event>)
+        fun askToLogin()
+        fun logout()
     }
 
 }
