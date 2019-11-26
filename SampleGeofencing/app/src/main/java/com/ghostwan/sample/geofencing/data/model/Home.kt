@@ -18,7 +18,7 @@ data class Home(
     val id: Long? = null
 ) {
     @Exclude
-    fun toMap(): MutableMap<String, Any?> {
+    fun toMap(): Map<String, Any?> {
         return mutableMapOf(
             "latLng" to latLng,
             "isGeofencingRegistered" to isGeofencingRegistered,

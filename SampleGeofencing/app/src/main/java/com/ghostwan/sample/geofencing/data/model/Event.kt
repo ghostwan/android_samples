@@ -20,7 +20,7 @@ data class Event(
         return mapOf(
             "id" to id,
             "source" to source,
-            "date" to date,
+            "date" to date.toString(),
             "type" to if (isHome) "home" else "left"
         )
     }

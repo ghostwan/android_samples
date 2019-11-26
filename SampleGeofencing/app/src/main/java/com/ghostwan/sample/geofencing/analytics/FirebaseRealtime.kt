@@ -8,6 +8,8 @@ import com.ghostwan.sample.geofencing.data.model.Home
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import java.util.*
+import kotlin.collections.HashMap
 
 class FirebaseRealtime {
 
@@ -15,15 +17,9 @@ class FirebaseRealtime {
 
     fun sendEvent(event: Event, home: Home) {
         FirebaseAuth.getInstance().currentUser?.let {
-            val eventKey = database.child("events").push().key
-            if (eventKey == null) {
-                Log.w(TAG, "Couldn't get push key for posts")
-                return
-            }
             val eventValues = event.toMap()
-
-            val childUpdates = getHomeInfos(it, home)
-            childUpdates["/homes-events/${it.uid}/$eventKey"] = eventValues
+            val childUpdates = getUserInfos(it, home)
+            childUpdates["/users-events/${getUserID(it)}/${Date().time}"] = eventValues
             updateDatabase(childUpdates)
         }
 
@@ -39,24 +35,31 @@ class FirebaseRealtime {
 
     fun saveHome(home: Home) {
         FirebaseAuth.getInstance().currentUser?.let {
-            updateDatabase(getHomeInfos(it, home))
+            updateDatabase(getUserInfos(it, home))
         }
     }
 
-    fun getHomeInfos(user: FirebaseUser, home: Home): HashMap<String, Any> {
+    fun getUserInfos(user: FirebaseUser, home: Home): HashMap<String, Any> {
         val childUpdates: HashMap<String, Any> = HashMap()
-        
-        val userInfos = home.toMap()
+
+        val infos = mutableMapOf<String, Any?>()
+        infos["home"] = home.toMap()
         val deviceInfos = mapOf<String, Any?>(
             "manufacturer" to Build.MANUFACTURER,
             "model" to Build.MODEL,
             "version" to Build.VERSION.SDK_INT,
             "version_release" to Build.VERSION.RELEASE
         )
-        userInfos["name"] = user.displayName
-        userInfos["device"] = deviceInfos
-        childUpdates["/homes/${user.uid}"] = userInfos
+        infos["name"] = user.displayName
+        infos["device"] = deviceInfos
+        infos["udpate_date"] = Date().toString()
+        childUpdates["/users/${getUserID(user)}"] = infos
         return childUpdates
     }
 
+    fun getUserID(user: FirebaseUser) = user.email
+        ?.toCharArray()
+        ?.filter { it.isLetterOrDigit() }
+        ?.joinToString (separator = "")
+        ?: user.uid
 }
