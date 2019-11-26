@@ -20,7 +20,6 @@ data class Home(
     @Exclude
     fun toMap(): Map<String, Any?> {
         return mutableMapOf(
-            "latLng" to latLng,
             "isGeofencingRegistered" to isGeofencingRegistered,
             "radius" to radius,
             "initialTrigger" to if (initialTrigger == GeofencingRequest.INITIAL_TRIGGER_EXIT) "exit" else "enter"

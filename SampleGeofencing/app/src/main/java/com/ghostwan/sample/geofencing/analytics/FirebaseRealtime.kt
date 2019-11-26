@@ -18,7 +18,8 @@ class FirebaseRealtime {
     fun sendEvent(event: Event, home: Home) {
         FirebaseAuth.getInstance().currentUser?.let {
             val eventValues = event.toMap()
-            val childUpdates = getUserInfos(it, home)
+            eventValues["home"] = home.toMap()
+            val childUpdates: HashMap<String, Any> = HashMap()
             childUpdates["/users-events/${getUserID(it)}/${Date().time}"] = eventValues
             updateDatabase(childUpdates)
         }
