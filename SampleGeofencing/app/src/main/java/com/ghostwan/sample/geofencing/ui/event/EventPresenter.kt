@@ -3,12 +3,17 @@ package com.ghostwan.sample.geofencing.ui.event
 import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.Source
+import com.ghostwan.sample.geofencing.data.model.Home
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 
-class EventPresenter(private val repository: Repository, private val preferenceManager: PreferenceManager) :
+class EventPresenter(
+    private val repository: Repository,
+    private val preferenceManager: PreferenceManager
+) :
     EventContract.Presenter, CoroutineScope {
+
 
     private var view: EventContract.View? = null
     private var job = Job()
@@ -29,6 +34,13 @@ class EventPresenter(private val repository: Repository, private val preferenceM
                 }
             } else {
                 if (repository.isHomeValueExist()) {
+                    repository.getHomeData()?.let {
+                        if (it.homeType == null || it.homeLocation == null) {
+                            withContext(Main) {
+                                view?.askHomeInformation(it)
+                            }
+                        }
+                    }
                     val isHome = repository.isHome()
                     withContext(Main) {
                         view?.setIsHome(isHome)
@@ -91,5 +103,11 @@ class EventPresenter(private val repository: Repository, private val preferenceM
     override fun setAuthentication(isAuthenticated: Boolean) {
         preferenceManager.setIsAuthenticated(isAuthenticated)
         updateStatus()
+    }
+
+    override fun saveHome(home: Home) {
+        launch {
+            repository.saveHomeData(home)
+        }
     }
 }

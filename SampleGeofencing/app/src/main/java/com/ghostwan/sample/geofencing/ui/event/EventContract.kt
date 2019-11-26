@@ -2,6 +2,7 @@ package com.ghostwan.sample.geofencing.ui.event
 
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.ui.BaseContract
 
 interface EventContract {
@@ -14,6 +15,7 @@ interface EventContract {
         fun clearDatabase()
         fun setHomeLocation(latitude: Long, longitude: Long)
         fun setAuthentication(isAuthenticated: Boolean)
+        fun saveHome(home: Home)
     }
 
     interface View {
@@ -22,6 +24,7 @@ interface EventContract {
         fun showEventList(events: List<Event>)
         fun askToLogin()
         fun logout()
+        fun askHomeInformation(home: Home)
     }
 
 }

@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.auth.AuthUI
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
-import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.maps.MapFragment
@@ -31,14 +31,12 @@ import org.koin.android.ext.android.inject
 
 class EventFragment : BaseFragment(), EventContract.View {
 
-
     companion object {
         const val MAPS_REQUEST_CODE = 1
         const val LOGIN_REQUEST_CODE = 2
     }
 
     private val presenter by inject<EventContract.Presenter>()
-    private val preferenceManager by inject<PreferenceManager>()
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
@@ -177,6 +175,40 @@ class EventFragment : BaseFragment(), EventContract.View {
             .setMessage(R.string.authenticate_signup)
             .setPositiveButton(R.string.yes) { dialog, id -> loginToAccount() }
             .setNegativeButton(R.string.no) { dialog, id -> presenter.setAuthentication(false) }
+            .create()
+            .show()
+    }
+
+    override fun askHomeInformation(home: Home) {
+        askHomeLocation(home)
+    }
+
+    fun askHomeLocation(home: Home) {
+        dialogBuilder()
+            .setMessage(R.string.ask_home_located)
+            .setPositiveButton(R.string.city) { _, _ ->
+                home.homeLocation = "city"
+                askHomeType(home)
+            }
+            .setNegativeButton(R.string.countryside) { _, _ ->
+                home.homeLocation = "countryside"
+                askHomeType(home)
+            }
+            .create()
+            .show()
+    }
+
+    fun askHomeType(home: Home) {
+        dialogBuilder()
+            .setMessage(R.string.ask_home_type)
+            .setPositiveButton(R.string.flat) { _, _ ->
+                home.homeType = "flat"
+                presenter.saveHome(home)
+            }
+            .setNegativeButton(R.string.house) { _, _ ->
+                home.homeType = "house"
+                presenter.saveHome(home)
+            }
             .create()
             .show()
     }

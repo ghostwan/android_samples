@@ -28,6 +28,7 @@ val mainModule = module {
     }
     single {
         Room.databaseBuilder(androidApplication(), Database::class.java, "event-db")
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
     single { get<Database>().eventDao() }

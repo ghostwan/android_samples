@@ -50,6 +50,7 @@ class RoomRepository(
 
     override suspend fun saveHomeData(home: Home) {
         homeDao.update(home)
+        analyticsManager.sendHomeData(home)
     }
 
     override suspend fun createHome(latLng: LatLng, radius: Double, initialTrigger: Int): Home {

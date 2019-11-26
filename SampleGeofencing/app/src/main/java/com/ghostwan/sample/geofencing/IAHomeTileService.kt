@@ -7,6 +7,7 @@ import android.service.quicksettings.TileService
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.event.EventContract
 import org.koin.android.ext.android.inject
@@ -64,6 +65,9 @@ class IAHomeTileService : TileService(), EventContract.View {
     }
 
     override fun logout() {
+    }
+
+    override fun askHomeInformation(home: Home) {
     }
 
 }

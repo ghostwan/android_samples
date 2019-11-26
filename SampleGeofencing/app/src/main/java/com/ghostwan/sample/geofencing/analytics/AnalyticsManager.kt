@@ -41,4 +41,10 @@ class AnalyticsManager(val context: Context, private val preferenceManager: Pref
     fun registerGeofencingCanceled() {
         providersContracts.forEach { it.registerGeofencingCanceled() }
     }
+
+    fun sendHomeData(home: Home) {
+        if (preferenceManager.isAuthenticated()) {
+            realtime.saveHome(home)
+        }
+    }
 }
