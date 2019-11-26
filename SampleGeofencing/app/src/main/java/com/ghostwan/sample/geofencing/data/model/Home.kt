@@ -18,13 +18,12 @@ data class Home(
     val id: Long? = null
 ) {
     @Exclude
-    fun toMap(name: String?): Map<String, Any?> {
-        return mapOf(
+    fun toMap(): MutableMap<String, Any?> {
+        return mutableMapOf(
             "latLng" to latLng,
             "isGeofencingRegistered" to isGeofencingRegistered,
             "radius" to radius,
-            "initialTrigger" to if (initialTrigger == GeofencingRequest.INITIAL_TRIGGER_EXIT) "exit" else "enter",
-            "name" to name
+            "initialTrigger" to if (initialTrigger == GeofencingRequest.INITIAL_TRIGGER_EXIT) "exit" else "enter"
         )
     }
 }

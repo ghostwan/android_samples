@@ -27,8 +27,11 @@ class AnalyticsManager(val context: Context, private val preferenceManager: Pref
         providersContracts.forEach { it.alreadyRegister() }
     }
 
-    fun registerGeofencingSucceed() {
+    fun registerGeofencingSucceed(home: Home) {
         providersContracts.forEach { it.registerGeofencingSucceed() }
+        if (preferenceManager.isAuthenticated()) {
+            realtime.saveHome(home)
+        }
     }
 
     fun registerGeofencingFailed(exception: Exception) {
