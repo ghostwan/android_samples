@@ -13,6 +13,7 @@ interface EventContract {
         fun refreshEventList()
         fun clearDatabase()
         fun setHomeLocation(latitude: Long, longitude: Long)
+        fun setAuthentication(isAuthenticated: Boolean)
     }
 
     interface View {

@@ -27,15 +27,16 @@ class EventPresenter(private val repository: Repository, private val preferenceM
                 withContext(Main) {
                     view?.askToLogin()
                 }
-            }
-            if (repository.isHomeValueExist()) {
-                val isHome = repository.isHome()
-                withContext(Main) {
-                    view?.setIsHome(isHome)
-                }
             } else {
-                withContext(Main) {
-                    view?.askIsHome()
+                if (repository.isHomeValueExist()) {
+                    val isHome = repository.isHome()
+                    withContext(Main) {
+                        view?.setIsHome(isHome)
+                    }
+                } else {
+                    withContext(Main) {
+                        view?.askIsHome()
+                    }
                 }
             }
         }
@@ -85,5 +86,10 @@ class EventPresenter(private val repository: Repository, private val preferenceM
     }
 
     override fun setHomeLocation(latitude: Long, longitude: Long) {
+    }
+
+    override fun setAuthentication(isAuthenticated: Boolean) {
+        preferenceManager.setIsAuthenticated(isAuthenticated)
+        updateStatus()
     }
 }

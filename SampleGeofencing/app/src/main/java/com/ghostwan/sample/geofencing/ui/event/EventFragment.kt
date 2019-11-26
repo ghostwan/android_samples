@@ -136,19 +136,16 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     override fun askIsHome() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
-                findNavController().navigate(R.id.navigation_map)
+                selectHouseDialog {
+                    findNavController().navigate(R.id.navigation_map)
+                }
             }
             .setNegativeButton(R.string.no) { dialog, id ->
+                selectLaterHouseDialog()
                 presenter.leaveHome(Source.App)
             }
             .create()
@@ -165,10 +162,10 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
             LOGIN_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    preferenceManager.setIsAuthenticated(true)
+                    presenter.setAuthentication(true)
                     message(R.string.authentication_succeed)
                 } else {
-                    preferenceManager.setIsAuthenticated(false)
+                    presenter.setAuthentication(false)
                 }
             }
         }
@@ -176,31 +173,37 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     override fun askToLogin() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.authenticate_signup)
             .setPositiveButton(R.string.yes) { dialog, id -> loginToAccount() }
-            .setNegativeButton(R.string.no) { dialog, id -> preferenceManager.setIsAuthenticated(false) }
+            .setNegativeButton(R.string.no) { dialog, id -> presenter.setAuthentication(false) }
             .create()
             .show()
     }
 
     private fun logoutDialog() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.authenticate_logout)
             .setPositiveButton(R.string.cancel) { dialog, id -> }
             .setNegativeButton(R.string.logout) { dialog, id -> logout() }
+            .create()
+            .show()
+    }
+
+    private fun selectLaterHouseDialog() {
+        dialogBuilder()
+            .setMessage(R.string.select_later_house_dialog)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .create()
+            .show()
+    }
+
+
+    private fun selectHouseDialog(dismissCallback: () -> Unit) {
+        dialogBuilder()
+            .setMessage(R.string.select_house_dialog)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .setOnDismissListener { dismissCallback.invoke() }
             .create()
             .show()
     }
@@ -251,5 +254,15 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
         }
         snack?.show()
+    }
+
+    fun dialogBuilder(): AlertDialog.Builder {
+        return AlertDialog
+            .Builder(
+                ContextThemeWrapper(
+                    context,
+                    R.style.AppTheme_NoActionBar
+                )
+            )
     }
 }
