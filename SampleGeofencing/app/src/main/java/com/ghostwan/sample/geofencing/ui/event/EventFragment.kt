@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.auth.AuthUI
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
-import com.ghostwan.sample.geofencing.data.PreferenceManager
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.data.model.Home
+import com.ghostwan.sample.geofencing.geofencing.AutoStartManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.maps.MapFragment
@@ -26,6 +28,7 @@ import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import dev.doubledot.doki.views.DokiContentView
 import org.koin.android.ext.android.inject
 
 
@@ -38,7 +41,7 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     private val presenter by inject<EventContract.Presenter>()
-    private val preferenceManager by inject<PreferenceManager>()
+    private val autoStartManager by inject<AutoStartManager>()
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
@@ -136,19 +139,16 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     override fun askIsHome() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.are_you_home)
             .setPositiveButton(R.string.yes) { dialog, id ->
                 presenter.enterHome(Source.App)
-                findNavController().navigate(R.id.navigation_map)
+                selectHouseDialog {
+                    findNavController().navigate(R.id.navigation_map)
+                }
             }
             .setNegativeButton(R.string.no) { dialog, id ->
+                selectLaterHouseDialog()
                 presenter.leaveHome(Source.App)
             }
             .create()
@@ -165,10 +165,10 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
             LOGIN_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    preferenceManager.setIsAuthenticated(true)
+                    presenter.setPreference(Preference.AUTHENTICATED, true)
                     message(R.string.authentication_succeed)
                 } else {
-                    preferenceManager.setIsAuthenticated(false)
+                    presenter.setPreference(Preference.AUTHENTICATED, false)
                 }
             }
         }
@@ -176,31 +176,76 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     override fun askToLogin() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.authenticate_signup)
             .setPositiveButton(R.string.yes) { dialog, id -> loginToAccount() }
-            .setNegativeButton(R.string.no) { dialog, id -> preferenceManager.setIsAuthenticated(false) }
+            .setNegativeButton(R.string.no) { dialog, id ->
+                presenter.setPreference(
+                    Preference.AUTHENTICATED,
+                    false
+                )
+            }
+            .create()
+            .show()
+    }
+
+    override fun askHomeInformation(home: Home) {
+        askHomeLocation(home)
+    }
+
+    fun askHomeLocation(home: Home) {
+        dialogBuilder()
+            .setMessage(R.string.ask_home_located)
+            .setPositiveButton(R.string.city) { _, _ ->
+                home.homeLocation = "city"
+                askHomeType(home)
+            }
+            .setNegativeButton(R.string.countryside) { _, _ ->
+                home.homeLocation = "countryside"
+                askHomeType(home)
+            }
+            .create()
+            .show()
+    }
+
+    fun askHomeType(home: Home) {
+        dialogBuilder()
+            .setMessage(R.string.ask_home_type)
+            .setPositiveButton(R.string.flat) { _, _ ->
+                home.homeType = "flat"
+                presenter.saveHome(home)
+            }
+            .setNegativeButton(R.string.house) { _, _ ->
+                home.homeType = "house"
+                presenter.saveHome(home)
+            }
             .create()
             .show()
     }
 
     private fun logoutDialog() {
-        AlertDialog
-            .Builder(
-                ContextThemeWrapper(
-                    context,
-                    R.style.AppTheme_NoActionBar
-                )
-            )
+        dialogBuilder()
             .setMessage(R.string.authenticate_logout)
             .setPositiveButton(R.string.cancel) { dialog, id -> }
             .setNegativeButton(R.string.logout) { dialog, id -> logout() }
+            .create()
+            .show()
+    }
+
+    private fun selectLaterHouseDialog() {
+        dialogBuilder()
+            .setMessage(R.string.select_later_house_dialog)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .create()
+            .show()
+    }
+
+
+    private fun selectHouseDialog(dismissCallback: () -> Unit) {
+        dialogBuilder()
+            .setMessage(R.string.select_house_dialog)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .setOnDismissListener { dismissCallback.invoke() }
             .create()
             .show()
     }
@@ -251,5 +296,53 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
         }
         snack?.show()
+    }
+
+    fun dialogBuilder(): AlertDialog.Builder {
+        return AlertDialog
+            .Builder(
+                ContextThemeWrapper(
+                    context,
+                    R.style.AppTheme_NoActionBar
+                )
+            )
+    }
+
+    override fun showDKMA() {
+        val dokiCustomView = View.inflate(context, R.layout.doki, null)
+        dokiCustomView?.findViewById<DokiContentView?>(R.id.doki_content)?.let {
+            it.setButtonsVisibility(false)
+            it.loadContent()
+        }
+
+        dialogBuilder()
+            .setView(dokiCustomView)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .setOnDismissListener { presenter.checkStateMachine() }
+            .create()
+            .show()
+    }
+
+    override fun showEnableAutoStart() {
+        context?.ifNotNull { nonNullContext ->
+            dialogBuilder()
+                .setMessage(R.string.autostarted_dialog)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    autoStartManager.startSettings(nonNullContext)
+                    presenter.setPreference(Preference.AUTO_START, true)
+
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                    presenter.setPreference(Preference.AUTO_START, false)
+                }
+                .create()
+                .show()
+        }
+    }
+
+    override fun isAutoStartPermissionAvailable(): Boolean {
+        return context?.ifNotNull {
+            autoStartManager.isSettingsHandle(it)
+        } ?: elseNull { false }
     }
 }

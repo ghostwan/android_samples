@@ -16,11 +16,11 @@ data class Event(
     @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
     @Exclude
-    fun toMap(): Map<String, Any?> {
-        return mapOf(
+    fun toMap(): MutableMap<String, Any?> {
+        return mutableMapOf(
             "id" to id,
             "source" to source,
-            "date" to date,
+            "date" to date.toString(),
             "type" to if (isHome) "home" else "left"
         )
     }

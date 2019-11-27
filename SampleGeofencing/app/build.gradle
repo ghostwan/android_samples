@@ -13,8 +13,8 @@ android {
         applicationId "com.ghostwan.sample.geofencing"
         minSdkVersion 26
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 5
+        versionName "1.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // Go to https://console.developers.google.com/apis/credentials?project=level-prism-257420 to retrieve the Google API key
@@ -31,9 +31,37 @@ android {
         //
         resValue "string", "GOOGLE_MAP_KEY", "${getLocalProperty('GOOGLE_MAP_KEY')}"
     }
+    signingConfigs {
+        // To use specific keystore add in you local.properties file, keystore information:
+        // KEYSTORE_PATH=/home/......keystore
+        // KEYSTORE_PASSWORD=my_keystore_password
+        // KEYSTORE_ALIAS=my_alias
+        // KEY_PASSWORD=my_key_password
+        release {
+            if (getLocalProperty("KEYSTORE_PATH") != "") {
+                def keystorePwd = getLocalProperty("KEYSTORE_PASSWORD")
+                def alias = getLocalProperty("KEYSTORE_ALIAS")
+                def keystore = new File(getLocalProperty("KEYSTORE_PATH"))
+                def keyPwd = getLocalProperty("KEY_PASSWORD")
+                if (keystore.exists()) {
+                    storeFile keystore
+                    storePassword keystorePwd
+                    keyAlias alias
+                    keyPassword keyPwd
+                } else {
+                    throw new GradleScriptException("keystore file is not exist", null)
+                }
+            }
+        }
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -99,6 +127,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:19.2.0'
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+
+    //Doki
+    implementation('dev.doubledot.doki:library:0.0.1@aar') {
+        transitive = true
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'

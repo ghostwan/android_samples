@@ -3,6 +3,7 @@ package com.ghostwan.sample.geofencing.di
 import androidx.room.Room
 import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import com.ghostwan.sample.geofencing.data.*
+import com.ghostwan.sample.geofencing.geofencing.AutoStartManager
 import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
 import com.ghostwan.sample.geofencing.geofencing.NotificationManager
 import com.ghostwan.sample.geofencing.ui.event.EventContract
@@ -14,6 +15,7 @@ import org.koin.dsl.module
 
 val mainModule = module {
     single { PreferenceManager(get()) }
+    single { AutoStartManager() }
     single { AnalyticsManager(get(), get()) }
     single<Repository> { RoomRepository(get(), get(), get()) }
     factory<EventContract.Presenter> {
@@ -28,6 +30,7 @@ val mainModule = module {
     }
     single {
         Room.databaseBuilder(androidApplication(), Database::class.java, "event-db")
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
     single { get<Database>().eventDao() }

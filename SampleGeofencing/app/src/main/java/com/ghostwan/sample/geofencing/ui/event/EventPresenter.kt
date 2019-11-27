@@ -1,14 +1,20 @@
 package com.ghostwan.sample.geofencing.ui.event
 
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.Source
+import com.ghostwan.sample.geofencing.data.model.Home
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 
-class EventPresenter(private val repository: Repository, private val preferenceManager: PreferenceManager) :
+class EventPresenter(
+    private val repository: Repository,
+    private val preferenceManager: PreferenceManager
+) :
     EventContract.Presenter, CoroutineScope {
+
 
     private var view: EventContract.View? = null
     private var job = Job()
@@ -17,25 +23,38 @@ class EventPresenter(private val repository: Repository, private val preferenceM
     override fun attachView(view: EventContract.View) {
         if (this.view == null) {
             this.view = view
-            updateStatus()
+            checkStateMachine()
         }
     }
 
-    override fun updateStatus() {
+    override fun checkStateMachine() {
         launch {
-            if (!preferenceManager.isPreferenceAuthenticatedExist()) {
-                withContext(Main) {
+            when {
+                preferenceManager.isNotExistSet(Preference.DKMA) -> withContext(Main) {
+                    view?.showDKMA()
+                }
+                preferenceManager.isNotExist(Preference.AUTO_START)
+                        && view?.isAutoStartPermissionAvailable() ?: false -> withContext(Main) {
+                    view?.showEnableAutoStart()
+                }
+                preferenceManager.isNotExist(Preference.AUTHENTICATED) -> withContext(Main) {
                     view?.askToLogin()
                 }
-            }
-            if (repository.isHomeValueExist()) {
-                val isHome = repository.isHome()
-                withContext(Main) {
-                    view?.setIsHome(isHome)
-                }
-            } else {
-                withContext(Main) {
+                repository.isHomeValueNotExist() -> withContext(Main) {
                     view?.askIsHome()
+                }
+                else -> {
+                    repository.getHomeData()?.let {
+                        if (it.homeType == null || it.homeLocation == null) {
+                            withContext(Main) {
+                                view?.askHomeInformation(it)
+                            }
+                        }
+                    }
+                    val isHome = repository.isHome()
+                    withContext(Main) {
+                        view?.setIsHome(isHome)
+                    }
                 }
             }
         }
@@ -85,5 +104,16 @@ class EventPresenter(private val repository: Repository, private val preferenceM
     }
 
     override fun setHomeLocation(latitude: Long, longitude: Long) {
+    }
+
+    override fun setPreference(preference: Preference, value: Boolean) {
+        preferenceManager.set(preference, value)
+        checkStateMachine()
+    }
+
+    override fun saveHome(home: Home) {
+        launch {
+            repository.saveHomeData(home)
+        }
     }
 }

@@ -7,11 +7,13 @@ import android.service.quicksettings.TileService
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
+import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.event.EventContract
 import org.koin.android.ext.android.inject
 
 class IAHomeTileService : TileService(), EventContract.View {
+
 
     private val presenter by inject<EventContract.Presenter>()
     private val broadcastManager by lazy { LocalBroadcastManager.getInstance(this) }
@@ -54,7 +56,11 @@ class IAHomeTileService : TileService(), EventContract.View {
     }
 
     override fun askIsHome() {
-        startActivity(Intent(this, MainActivity::class.java).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+        startActivity(
+            Intent(
+                this,
+                MainActivity::class.java
+            ).also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
     }
 
     override fun showEventList(events: List<Event>) {
@@ -66,4 +72,16 @@ class IAHomeTileService : TileService(), EventContract.View {
     override fun logout() {
     }
 
+    override fun askHomeInformation(home: Home) {
+    }
+
+    override fun showDKMA() {
+    }
+
+    override fun showEnableAutoStart() {
+    }
+
+    override fun isAutoStartPermissionAvailable(): Boolean {
+        return true
+    }
 }

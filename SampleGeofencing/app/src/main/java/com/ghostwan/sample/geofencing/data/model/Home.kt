@@ -14,17 +14,19 @@ data class Home(
     var isGeofencingRegistered: Boolean,
     var radius: Double,
     var initialTrigger: Int,
+    var homeLocation: String? = null,
+    var homeType: String? = null,
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null
 ) {
     @Exclude
-    fun toMap(name: String?): Map<String, Any?> {
-        return mapOf(
-            "latLng" to latLng,
+    fun toMap(): Map<String, Any?> {
+        return mutableMapOf(
             "isGeofencingRegistered" to isGeofencingRegistered,
             "radius" to radius,
             "initialTrigger" to if (initialTrigger == GeofencingRequest.INITIAL_TRIGGER_EXIT) "exit" else "enter",
-            "name" to name
+            "homeLocation" to homeLocation,
+            "homeType" to homeType
         )
     }
 }

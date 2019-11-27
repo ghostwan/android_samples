@@ -17,10 +17,10 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     private var view: MapContract.View? = null
 
     private companion object {
-        const val DEFAULT_RADIUS = 10.0
+        const val MINIMUM_RADIUS = 30.0
     }
 
-    private var radius = DEFAULT_RADIUS
+    private var radius = MINIMUM_RADIUS
     private var initialTrigger = GeofencingRequest.INITIAL_TRIGGER_EXIT
 
     private var job = Job()
@@ -32,11 +32,11 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     override fun attachView(view: MapContract.View) {
         if (this.view == null) {
             this.view = view
-            updateStatus()
+            checkStateMachine()
         }
     }
 
-    override fun updateStatus() {
+    override fun checkStateMachine() {
         launch {
             currentHome = repository.getHomeData()
 
@@ -58,7 +58,9 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
                 }
                 currentHome == null && permission -> {
                     withContext(Main) {
-                        radius = view?.getLastLocation()?.accuracy?.toDouble() ?: DEFAULT_RADIUS
+                        radius = view?.getLastLocation()?.accuracy?.toDouble() ?: MINIMUM_RADIUS
+                        if (radius < MINIMUM_RADIUS)
+                            radius = MINIMUM_RADIUS
                         view?.getLastLocation()?.ifNotNull {
                             setTemporaryMarker(it.toLatLng())
                             view?.moveCamera(it.toLatLng())

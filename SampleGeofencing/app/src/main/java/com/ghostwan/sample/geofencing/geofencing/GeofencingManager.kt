@@ -60,7 +60,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
                             R.string.geofecing_registration,
                             R.string.geofencing_added_succeed
                         )
-                        analyticsManager.registerGeofencingSucceed()
+                        analyticsManager.registerGeofencingSucceed(home)
                     }
                     addOnFailureListener {
                         Log.e(TAG, "Geofencing added failed ", it)
