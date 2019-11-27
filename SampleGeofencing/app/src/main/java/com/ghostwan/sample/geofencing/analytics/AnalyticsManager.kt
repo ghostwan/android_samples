@@ -1,6 +1,7 @@
 package com.ghostwan.sample.geofencing.analytics
 
 import android.content.Context
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
@@ -18,7 +19,7 @@ class AnalyticsManager(val context: Context, private val preferenceManager: Pref
 
     fun sendEvent(event: Event, home: Home?) {
         providersContracts.forEach { it.sendEvent(event, home) }
-        if (preferenceManager.isAuthenticated() && home != null) {
+        if (preferenceManager.isTrue(Preference.AUTHENTICATED) && home != null) {
             realtime.sendEvent(event, home)
         }
     }
@@ -29,7 +30,7 @@ class AnalyticsManager(val context: Context, private val preferenceManager: Pref
 
     fun registerGeofencingSucceed(home: Home) {
         providersContracts.forEach { it.registerGeofencingSucceed() }
-        if (preferenceManager.isAuthenticated()) {
+        if (preferenceManager.isTrue(Preference.AUTHENTICATED)) {
             realtime.saveHome(home)
         }
     }
@@ -43,7 +44,7 @@ class AnalyticsManager(val context: Context, private val preferenceManager: Pref
     }
 
     fun sendHomeData(home: Home) {
-        if (preferenceManager.isAuthenticated()) {
+        if (preferenceManager.isTrue(Preference.AUTHENTICATED)) {
             realtime.saveHome(home)
         }
     }

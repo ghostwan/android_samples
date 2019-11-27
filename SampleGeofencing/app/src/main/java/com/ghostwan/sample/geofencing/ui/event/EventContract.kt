@@ -25,6 +25,7 @@ interface EventContract {
         fun askToLogin()
         fun logout()
         fun askHomeInformation(home: Home)
+        fun showDKMA()
     }
 
 }

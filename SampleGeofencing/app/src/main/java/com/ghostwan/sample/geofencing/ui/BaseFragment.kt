@@ -24,7 +24,7 @@ abstract class BaseFragment : Fragment(), CoroutineScope {
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
-            getPresenter().updateStatus()
+            getPresenter().checkStateMachine()
         }
     }
 

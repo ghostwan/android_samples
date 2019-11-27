@@ -32,11 +32,11 @@ class MapPresenter(private val repository: Repository) : MapContract.Presenter, 
     override fun attachView(view: MapContract.View) {
         if (this.view == null) {
             this.view = view
-            updateStatus()
+            checkStateMachine()
         }
     }
 
-    override fun updateStatus() {
+    override fun checkStateMachine() {
         launch {
             currentHome = repository.getHomeData()
 

@@ -26,10 +26,12 @@ import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import dev.doubledot.doki.views.DokiContentView
 import org.koin.android.ext.android.inject
 
 
 class EventFragment : BaseFragment(), EventContract.View {
+
 
     companion object {
         const val MAPS_REQUEST_CODE = 1
@@ -296,5 +298,20 @@ class EventFragment : BaseFragment(), EventContract.View {
                     R.style.AppTheme_NoActionBar
                 )
             )
+    }
+
+    override fun showDKMA() {
+        val dokiCustomView = View.inflate(context, R.layout.doki, null)
+        dokiCustomView?.findViewById<DokiContentView?>(R.id.doki_content)?.let {
+            it.setButtonsVisibility(false)
+            it.loadContent()
+        }
+
+        dialogBuilder()
+            .setView(dokiCustomView)
+            .setPositiveButton(R.string.ok) { dialog, which -> }
+            .setOnDismissListener { presenter.checkStateMachine() }
+            .create()
+            .show()
     }
 }

@@ -1,5 +1,6 @@
 package com.ghostwan.sample.geofencing.ui.event
 
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.PreferenceManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.Source
@@ -22,18 +23,23 @@ class EventPresenter(
     override fun attachView(view: EventContract.View) {
         if (this.view == null) {
             this.view = view
-            updateStatus()
+            checkStateMachine()
         }
     }
 
-    override fun updateStatus() {
+    override fun checkStateMachine() {
         launch {
-            if (!preferenceManager.isPreferenceAuthenticatedExist()) {
-                withContext(Main) {
+            when {
+                preferenceManager.isNotExistSet(Preference.DKMA) -> withContext(Main) {
+                    view?.showDKMA()
+                }
+                preferenceManager.isNotExist(Preference.AUTHENTICATED) -> withContext(Main) {
                     view?.askToLogin()
                 }
-            } else {
-                if (repository.isHomeValueExist()) {
+                repository.isHomeValueNotExist() -> withContext(Main) {
+                    view?.askIsHome()
+                }
+                else -> {
                     repository.getHomeData()?.let {
                         if (it.homeType == null || it.homeLocation == null) {
                             withContext(Main) {
@@ -44,10 +50,6 @@ class EventPresenter(
                     val isHome = repository.isHome()
                     withContext(Main) {
                         view?.setIsHome(isHome)
-                    }
-                } else {
-                    withContext(Main) {
-                        view?.askIsHome()
                     }
                 }
             }
@@ -101,8 +103,8 @@ class EventPresenter(
     }
 
     override fun setAuthentication(isAuthenticated: Boolean) {
-        preferenceManager.setIsAuthenticated(isAuthenticated)
-        updateStatus()
+        preferenceManager.set(Preference.AUTHENTICATED, isAuthenticated)
+        checkStateMachine()
     }
 
     override fun saveHome(home: Home) {
