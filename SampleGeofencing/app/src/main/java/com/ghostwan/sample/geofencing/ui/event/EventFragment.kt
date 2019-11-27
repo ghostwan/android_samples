@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.auth.AuthUI
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
+import com.ghostwan.sample.geofencing.geofencing.AutoStartManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.maps.MapFragment
@@ -39,6 +41,7 @@ class EventFragment : BaseFragment(), EventContract.View {
     }
 
     private val presenter by inject<EventContract.Presenter>()
+    private val autoStartManager by inject<AutoStartManager>()
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
@@ -162,10 +165,10 @@ class EventFragment : BaseFragment(), EventContract.View {
             }
             LOGIN_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    presenter.setAuthentication(true)
+                    presenter.setPreference(Preference.AUTHENTICATED, true)
                     message(R.string.authentication_succeed)
                 } else {
-                    presenter.setAuthentication(false)
+                    presenter.setPreference(Preference.AUTHENTICATED, false)
                 }
             }
         }
@@ -176,7 +179,12 @@ class EventFragment : BaseFragment(), EventContract.View {
         dialogBuilder()
             .setMessage(R.string.authenticate_signup)
             .setPositiveButton(R.string.yes) { dialog, id -> loginToAccount() }
-            .setNegativeButton(R.string.no) { dialog, id -> presenter.setAuthentication(false) }
+            .setNegativeButton(R.string.no) { dialog, id ->
+                presenter.setPreference(
+                    Preference.AUTHENTICATED,
+                    false
+                )
+            }
             .create()
             .show()
     }
@@ -313,5 +321,28 @@ class EventFragment : BaseFragment(), EventContract.View {
             .setOnDismissListener { presenter.checkStateMachine() }
             .create()
             .show()
+    }
+
+    override fun showEnableAutoStart() {
+        context?.ifNotNull { nonNullContext ->
+            dialogBuilder()
+                .setMessage(R.string.autostarted_dialog)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    autoStartManager.startSettings(nonNullContext)
+                    presenter.setPreference(Preference.AUTO_START, true)
+
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                    presenter.setPreference(Preference.AUTO_START, false)
+                }
+                .create()
+                .show()
+        }
+    }
+
+    override fun isAutoStartPermissionAvailable(): Boolean {
+        return context?.ifNotNull {
+            autoStartManager.isSettingsHandle(it)
+        } ?: elseNull { false }
     }
 }

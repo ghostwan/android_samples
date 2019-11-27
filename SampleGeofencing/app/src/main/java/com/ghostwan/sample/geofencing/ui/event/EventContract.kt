@@ -1,5 +1,6 @@
 package com.ghostwan.sample.geofencing.ui.event
 
+import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
@@ -14,7 +15,7 @@ interface EventContract {
         fun refreshEventList()
         fun clearDatabase()
         fun setHomeLocation(latitude: Long, longitude: Long)
-        fun setAuthentication(isAuthenticated: Boolean)
+        fun setPreference(preference: Preference, value: Boolean)
         fun saveHome(home: Home)
     }
 
@@ -26,6 +27,8 @@ interface EventContract {
         fun logout()
         fun askHomeInformation(home: Home)
         fun showDKMA()
+        fun showEnableAutoStart()
+        fun isAutoStartPermissionAvailable(): Boolean
     }
 
 }

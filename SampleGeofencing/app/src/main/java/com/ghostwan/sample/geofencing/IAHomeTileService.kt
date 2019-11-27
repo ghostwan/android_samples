@@ -77,4 +77,11 @@ class IAHomeTileService : TileService(), EventContract.View {
 
     override fun showDKMA() {
     }
+
+    override fun showEnableAutoStart() {
+    }
+
+    override fun isAutoStartPermissionAvailable(): Boolean {
+        return true
+    }
 }

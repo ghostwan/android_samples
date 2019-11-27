@@ -33,6 +33,10 @@ class EventPresenter(
                 preferenceManager.isNotExistSet(Preference.DKMA) -> withContext(Main) {
                     view?.showDKMA()
                 }
+                preferenceManager.isNotExist(Preference.AUTO_START)
+                        && view?.isAutoStartPermissionAvailable() ?: false -> withContext(Main) {
+                    view?.showEnableAutoStart()
+                }
                 preferenceManager.isNotExist(Preference.AUTHENTICATED) -> withContext(Main) {
                     view?.askToLogin()
                 }
@@ -102,8 +106,8 @@ class EventPresenter(
     override fun setHomeLocation(latitude: Long, longitude: Long) {
     }
 
-    override fun setAuthentication(isAuthenticated: Boolean) {
-        preferenceManager.set(Preference.AUTHENTICATED, isAuthenticated)
+    override fun setPreference(preference: Preference, value: Boolean) {
+        preferenceManager.set(preference, value)
         checkStateMachine()
     }
 

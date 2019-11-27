@@ -23,6 +23,7 @@
     <string name="select_later_house_dialog">When you will be home, please select your home location by going to "Map" and by clicking on your home location</string>
     <string name="select_house_dialog">After accepting permissions, validate current location (green check) or click somewhere else to set your home location. Don\'t forget to validate by clicking on green check, this will add the geofence. At anytime you can clear the current location and reset it (menu)</string>
     <string name="permission_granted">Location permission granted: looking for current position</string>
+    <string name="autostarted_dialog">Your phone constructor seems to prevent app autostart, we need autostart so if your phone reboot you don"t have to restart the app to register geofence. Do you want to check if app autostart is allowed ?</string>
     <string name="permission_denied">Location permission denied: can\'t get current position</string>
     <string name="enable_permission">Please enable location permission in application settings</string>
     <string name="fix">Fix</string>

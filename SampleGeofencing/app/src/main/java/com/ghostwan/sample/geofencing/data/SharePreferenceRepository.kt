@@ -23,11 +23,19 @@ class PreferenceManager(val context: Context) {
     }
 
     fun isTrue(preference: Preference): Boolean {
-        return getPref().getBoolean(preference.key, preference.defaultValue)
+        return getPref().getBoolean(getKey(preference), preference.defaultValue)
+    }
+
+    private fun getKey(preference: Preference): String {
+        return preference.key ?: preference.name
+    }
+
+    fun isFalse(preference: Preference): Boolean {
+        return !isTrue(preference)
     }
 
     fun isExist(preference: Preference): Boolean {
-        return getPref().contains(preference.key)
+        return getPref().contains(getKey(preference))
     }
 
     fun isNotExist(preference: Preference): Boolean {
@@ -36,7 +44,7 @@ class PreferenceManager(val context: Context) {
 
     fun set(preference: Preference, value: Boolean) {
         with(getPref().edit()) {
-            putBoolean(preference.key, value)
+            putBoolean(getKey(preference), value)
             commit()
         }
     }
@@ -49,7 +57,8 @@ class PreferenceManager(val context: Context) {
     }
 }
 
-enum class Preference(val key: String, val defaultValue: Boolean = true) {
+enum class Preference(val key: String? = null, val defaultValue: Boolean = true) {
     AUTHENTICATED("IS_AUTHENTICATED_KEY"),
-    DKMA("DEVICE_INFO", false)
+    DKMA(defaultValue = false),
+    AUTO_START(defaultValue = false)
 }
