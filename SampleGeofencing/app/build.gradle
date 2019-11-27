@@ -31,9 +31,37 @@ android {
         //
         resValue "string", "GOOGLE_MAP_KEY", "${getLocalProperty('GOOGLE_MAP_KEY')}"
     }
+    signingConfigs {
+        // To use specific keystore add in you local.properties file, keystore information:
+        // KEYSTORE_PATH=/home/......keystore
+        // KEYSTORE_PASSWORD=my_keystore_password
+        // KEYSTORE_ALIAS=my_alias
+        // KEY_PASSWORD=my_key_password
+        release {
+            if (getLocalProperty("KEYSTORE_PATH") != "") {
+                def keystorePwd = getLocalProperty("KEYSTORE_PASSWORD")
+                def alias = getLocalProperty("KEYSTORE_ALIAS")
+                def keystore = new File(getLocalProperty("KEYSTORE_PATH"))
+                def keyPwd = getLocalProperty("KEY_PASSWORD")
+                if (keystore.exists()) {
+                    storeFile keystore
+                    storePassword keystorePwd
+                    keyAlias alias
+                    keyPassword keyPwd
+                } else {
+                    throw new GradleScriptException("keystore file is not exist", null)
+                }
+            }
+        }
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
