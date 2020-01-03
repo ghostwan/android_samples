@@ -21,16 +21,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver
-            android:name=".geofencing.GeofenceBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true" />
-
-        <receiver android:name=".StartUpBootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -39,16 +29,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <service
-            android:name=".IAHomeTileService"
-            android:icon="@drawable/enter_home"
-            android:label="@string/i_am_home"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
 
         <activity
             android:name=".MainActivity"

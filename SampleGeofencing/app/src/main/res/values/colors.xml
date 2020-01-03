@@ -3,20 +3,4 @@
     <color name="colorPrimary">#C58207</color>
     <color name="colorPrimaryDark">#6D4805</color>
     <color name="colorAccent">#D81B60</color>
-
-    <color name="homeTint">#A5D19A</color>
-    <color name="homePrimary">#8A43C92B</color>
-    <color name="homePrimaryDark">#5E2BC92E</color>
-    <color name="homeText">#089112</color>
-
-    <color name="leftTint">#E9A5BF</color>
-    <color name="leftPrimary">#8DC92B65</color>
-    <color name="leftPrimaryDark">#5EC92B65</color>
-    <color name="leftText">#B80C4B</color>
-
-    <color name="tmpPrimary">#5E3494E9</color>
-    <color name="tmpPrimaryDark">#5E2B53C9</color>
-
-    <color name="foreground_floating">#000000</color>
-    <color name="background_floating">#FFFFFF</color>
 </resources>
