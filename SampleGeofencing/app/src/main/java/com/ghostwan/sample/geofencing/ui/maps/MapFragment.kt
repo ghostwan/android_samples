@@ -118,7 +118,9 @@ class MapFragment : BaseFragment(), MapContract.View {
     override suspend fun checkAndAskPermissions(): Boolean {
         val result = PermissionManager.requestPermissions(
             this@MapFragment, 4,
-            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
         )
         return when (result) {
             is PermissionResult.PermissionGranted -> {
