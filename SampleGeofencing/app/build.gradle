@@ -8,11 +8,11 @@ apply plugin: 'io.fabric'
 // https://console.firebase.google.com/project/level-prism-257420/settings/general/android:com.ghostwan.sample.geofencing
 // in the app folder
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.ghostwan.sample.geofencing"
         minSdkVersion 26
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 5
         versionName "1.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
