@@ -2,9 +2,13 @@ package com.ghostwan.sample.geofencing.geofencing
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
+import com.ghostwan.sample.geofencing.MainActivity
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.ifNotNull
@@ -24,10 +28,16 @@ class NotificationManager(val context: Context) {
         } ?: elseNull {
             message
         }
+        val resultIntent = Intent(context, MainActivity::class.java)
+        val resultPendingIntent = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(resultIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
         val builder = NotificationCompat.Builder(context, geoFencingChannel.id)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
             .setContentText(displayMessage)
+            .setContentIntent(resultPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(context)) {

@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.coroutinespermission.PermissionManager
 import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -35,13 +36,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         launch {
-            PermissionManager.requestPermissions(
+            val result = PermissionManager.requestPermissions(
                 this@MainActivity, 4,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             )
-            geofencingManager.registerGeofencing()
+            if (result is PermissionResult.PermissionGranted) {
+                geofencingManager.registerGeofencing(true)
+            }
         }
     }
 }

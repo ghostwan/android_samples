@@ -7,7 +7,7 @@ import com.ghostwan.sample.geofencing.data.HomeManager
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-class StartUpBootReceiver : BroadcastReceiver(), KoinComponent {
+class BootReceiver : BroadcastReceiver(), KoinComponent {
 
     private val homeManager by inject<HomeManager>()
 

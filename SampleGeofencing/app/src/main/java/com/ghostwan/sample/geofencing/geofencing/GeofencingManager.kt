@@ -1,9 +1,12 @@
 package com.ghostwan.sample.geofencing.geofencing
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Repository
@@ -42,8 +45,22 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
         return repository.getHomeData()
     }
 
+    fun isPermissionNotGranted(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
+    }
+    fun isPermissionsNotGranted(): Boolean {
+        return isPermissionNotGranted(Manifest.permission.ACCESS_FINE_LOCATION)
+                || isPermissionNotGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
+                || isPermissionNotGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    }
+
     fun registerGeofencing(force: Boolean = false) {
         launch {
+            if (isPermissionsNotGranted()) {
+                notificationManager.display(R.string.geofecing_registration, R.string.geofencing_permission_issue)
+                return@launch
+            }
+
             getHome()?.ifNotNull { home ->
                 if (home.isGeofencingRegistered && !force) {
                     Log.w(TAG, "Geofencing already registered! ")

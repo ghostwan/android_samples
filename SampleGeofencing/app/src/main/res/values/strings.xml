@@ -34,6 +34,7 @@
     <string name="geofencing_added_succeed">Geofencing added succeed!</string>
     <string name="geofencing_added_failed">Geofencing added failed!</string>
     <string name="geofencing_added_removed">Geofencing removed</string>
+    <string name="geofencing_permission_issue">You need to accept the permissions for geofencing to work</string>
     <string name="geofencing_cancelled">Geofencing cancelled</string>
     <string name="geofencing_error">Geofencing error: </string>
     <string name="no_home_set">No home set</string>
