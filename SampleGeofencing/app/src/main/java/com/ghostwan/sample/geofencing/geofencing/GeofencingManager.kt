@@ -51,7 +51,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
     fun isPermissionsNotGranted(): Boolean {
         return isPermissionNotGranted(Manifest.permission.ACCESS_FINE_LOCATION)
                 || isPermissionNotGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
-                || isPermissionNotGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    || isPermissionNotGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     }
 
     fun registerGeofencing(force: Boolean = false) {
