@@ -1,6 +1,6 @@
 package com.ghostwan.sample.geofencing.ui.maps
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.location.Location
@@ -12,9 +12,7 @@ import android.view.*
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
-import com.eazypermissions.common.model.PermissionResult
-import com.eazypermissions.coroutinespermission.PermissionManager
-import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
+import com.ghostwan.sample.geofencing.LocationPermissionCompat
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.HomeManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
@@ -55,7 +53,7 @@ class MapFragment : BaseFragment(), MapContract.View {
     private var googleMap: GoogleMap? = null
     private lateinit var root: View
 
-    private val ctx: Context by lazy { context!! }
+    private val ctx: Context by lazy { requireContext() }
 
     override fun getPresenter(): BaseContract.BasePresenter {
         return presenter
@@ -116,22 +114,9 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     override suspend fun checkAndAskPermissions(): Boolean {
-        val result = PermissionManager.requestPermissions(
-            this@MapFragment, 4,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        )
-        return when (result) {
-            is PermissionResult.PermissionGranted -> {
-                displayPermissionGranted()
-                true
-            }
-            else -> {
-                displayPermissionRefused()
-                false
-            }
-        }
+        val result =  context?.let { LocationPermissionCompat.isBackgroundLocationGranted(it) } ?: false
+        Log.d("Sample", "result is $result")
+        return result
     }
 
     fun displayMarker(
@@ -217,10 +202,12 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
 
+    @SuppressLint("MissingPermission")
     override suspend fun getLastLocation(): Location? {
         return LocationServices.getFusedLocationProviderClient(ctx).lastLocation.await()
     }
 
+    @SuppressLint("MissingPermission")
     override suspend fun prepareMap(hasPermission: Boolean) {
         googleMap = mapFragment.getGoogleMap()
         if (hasPermission) {
@@ -235,10 +222,6 @@ class MapFragment : BaseFragment(), MapContract.View {
         googleMap?.setOnMapClickListener {
             presenter.setTemporaryMarker(it)
         }
-    }
-
-    fun displayPermissionGranted() {
-        Log.i(TAG, "location permission granted")
     }
 
     fun message(
@@ -289,13 +272,13 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     override fun displayNumberPicker(initialValue: Int) {
-        val numberPicker = NumberPicker(context!!)
+        val numberPicker = NumberPicker(requireContext())
         numberPicker.maxValue = 300
         numberPicker.minValue = 5
         numberPicker.value = initialValue
 
 
-        val builder = AlertDialog.Builder(context!!)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setView(numberPicker)
         builder.setTitle(R.string.changing_radius_title)
         builder.setMessage(R.string.changing_radius_message)
@@ -317,7 +300,7 @@ class MapFragment : BaseFragment(), MapContract.View {
                 else
                     "${getString(R.string.initial_trigger_exit)} "
 
-        val builder = AlertDialog.Builder(context!!)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.changing_initial_trigger_title)
         builder.setMessage(message)
         builder.setPositiveButton(

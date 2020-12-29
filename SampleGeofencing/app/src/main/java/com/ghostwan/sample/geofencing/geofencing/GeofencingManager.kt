@@ -1,17 +1,16 @@
 package com.ghostwan.sample.geofencing.geofencing
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
+import com.ghostwan.sample.geofencing.LocationPermissionCompat
 import com.ghostwan.sample.geofencing.R
+import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import com.ghostwan.sample.geofencing.data.Repository
 import com.ghostwan.sample.geofencing.data.model.Home
-import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import com.ghostwan.sample.geofencing.utils.elseNull
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.Geofence
@@ -45,18 +44,10 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
         return repository.getHomeData()
     }
 
-    fun isPermissionNotGranted(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED
-    }
-    fun isPermissionsNotGranted(): Boolean {
-        return isPermissionNotGranted(Manifest.permission.ACCESS_FINE_LOCATION)
-                || isPermissionNotGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    || isPermissionNotGranted(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-    }
-
+    @SuppressLint("MissingPermission")
     fun registerGeofencing(force: Boolean = false) {
         launch {
-            if (isPermissionsNotGranted()) {
+            if (!LocationPermissionCompat.isBackgroundLocationGranted(context)) {
                 notificationManager.display(R.string.geofecing_registration, R.string.geofencing_permission_issue)
                 return@launch
             }

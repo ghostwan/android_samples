@@ -56,4 +56,9 @@
     <string name="house">A house</string>
     <string name="city">In a city</string>
     <string name="countryside">In a countryside</string>
+    <string name="background_location_permission_title">Background Permission Needed</string>
+    <string name="background_location_permission_message">For your app to detect that you left even if the app is not started please on the next screen select: </string>
+    <string name="enable_location">Please enable your location services</string>
+    <string name="app_optimized_title">Battery Optimization issue</string>
+    <string name="app_optimized_message">Please unoptimized this app to make it work properly in background</string>
 </resources>

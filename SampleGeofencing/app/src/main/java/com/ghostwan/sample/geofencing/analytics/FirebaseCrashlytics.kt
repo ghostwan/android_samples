@@ -1,13 +1,13 @@
 package com.ghostwan.sample.geofencing.analytics
 
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.GeofencingRequest
 
-class FirebaseCrashlytics : AnalyticsProviderContract {
+class FirebaseCrashlytics() : AnalyticsProviderContract {
 
     companion object {
         private const val SOURCE_KEY: String = "source"
@@ -17,6 +17,8 @@ class FirebaseCrashlytics : AnalyticsProviderContract {
         private const val TRIGGER_KEY: String = "trigger"
         private const val IS_GEOFENCE_REGISTER_KEY: String = "geofencing register"
     }
+
+    private val crashlytics : FirebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
     override fun sendEvent(event: Event, home: Home?) {
 
@@ -36,34 +38,35 @@ class FirebaseCrashlytics : AnalyticsProviderContract {
             else -> EventReport()
         }
 
-        Crashlytics.setString(SOURCE_KEY, event.source.name)
-        Crashlytics.setString(EVENT_KEY, if (event.isHome) "come home" else "left home")
-        Crashlytics.setString(DATE_KEY, event.date.toString())
+
+        crashlytics.setCustomKey(SOURCE_KEY, event.source.name)
+        crashlytics.setCustomKey(EVENT_KEY, if (event.isHome) "come home" else "left home")
+        crashlytics.setCustomKey(DATE_KEY, event.date.toString())
         home?.ifNotNull {
-            Crashlytics.setDouble(RADIUS_KEY, it.radius)
-            Crashlytics.setString(
+            crashlytics.setCustomKey(RADIUS_KEY, it.radius)
+            crashlytics.setCustomKey(
                 TRIGGER_KEY,
                 if (it.initialTrigger == GeofencingRequest.INITIAL_TRIGGER_EXIT) "EXIT" else "ENTER"
             )
-            Crashlytics.setBool(IS_GEOFENCE_REGISTER_KEY, it.isGeofencingRegistered)
+            crashlytics.setCustomKey(IS_GEOFENCE_REGISTER_KEY, it.isGeofencingRegistered)
         }
-        Crashlytics.logException(exception)
+        crashlytics.recordException(exception)
     }
 
     override fun alreadyRegister() {
-        Crashlytics.logException(AlreadyRegisterReport())
+        crashlytics.recordException(AlreadyRegisterReport())
     }
 
     override fun registerGeofencingSucceed() {
-        Crashlytics.logException(RegisteringSuccessReport())
+        crashlytics.recordException(RegisteringSuccessReport())
     }
 
     override fun registerGeofencingFailed(exception: Exception) {
-        Crashlytics.logException(RegisteringFailedReport(exception))
+        crashlytics.recordException(RegisteringFailedReport(exception))
     }
 
     override fun registerGeofencingCanceled() {
-        Crashlytics.logException(RegisteringCanceledReport())
+        crashlytics.recordException(RegisteringCanceledReport())
     }
 
     open class EventReport : Throwable()
