@@ -3,10 +3,8 @@ package com.ghostwan.sample.geofencing
 import android.Manifest
 import android.content.Context
 import android.content.Context.POWER_SERVICE
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import androidx.activity.result.ActivityResultCaller

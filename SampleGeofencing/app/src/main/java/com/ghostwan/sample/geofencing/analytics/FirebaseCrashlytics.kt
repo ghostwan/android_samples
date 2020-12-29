@@ -1,11 +1,11 @@
 package com.ghostwan.sample.geofencing.analytics
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.utils.ifNotNull
 import com.google.android.gms.location.GeofencingRequest
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class FirebaseCrashlytics() : AnalyticsProviderContract {
 
