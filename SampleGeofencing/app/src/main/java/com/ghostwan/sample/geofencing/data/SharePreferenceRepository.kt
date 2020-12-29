@@ -59,6 +59,8 @@ class PreferenceManager(val context: Context) {
 
 enum class Preference(val key: String? = null, val defaultValue: Boolean = true) {
     AUTHENTICATED("IS_AUTHENTICATED_KEY"),
+    UNOPTIMIZATION,
     DKMA(defaultValue = false),
-    AUTO_START(defaultValue = false)
+    AUTO_START(defaultValue = false),
+    PERMISSION
 }

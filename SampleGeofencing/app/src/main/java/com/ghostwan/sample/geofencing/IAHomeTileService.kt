@@ -2,8 +2,10 @@ package com.ghostwan.sample.geofencing
 
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.annotation.RequiresApi
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
@@ -83,5 +85,11 @@ class IAHomeTileService : TileService(), EventContract.View {
 
     override fun isAutoStartPermissionAvailable(): Boolean {
         return true
+    }
+
+    override fun showOptimisationDialog() {
+    }
+
+    override fun askForPermission() {
     }
 }

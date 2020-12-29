@@ -1,6 +1,8 @@
 package com.ghostwan.sample.geofencing.di
 
 import androidx.room.Room
+import com.ghostwan.sample.geofencing.geofencing.LocationPermissionManager
+import com.ghostwan.sample.geofencing.geofencing.AppOptimizationManager
 import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
 import com.ghostwan.sample.geofencing.data.*
 import com.ghostwan.sample.geofencing.geofencing.AutoStartManager
@@ -17,16 +19,14 @@ val mainModule = module {
     single { PreferenceManager(get()) }
     single { AutoStartManager() }
     single { AnalyticsManager(get(), get()) }
+    factory { LocationPermissionManager(get()) }
+    factory { AppOptimizationManager(get()) }
     single<Repository> { RoomRepository(get(), get(), get()) }
     factory<EventContract.Presenter> {
-        EventPresenter(
-            get(), get()
-        )
+        EventPresenter(get(), get())
     }
     factory<MapContract.Presenter> {
-        MapPresenter(
-            get()
-        )
+        MapPresenter(get())
     }
     single {
         Room.databaseBuilder(androidApplication(), Database::class.java, "event-db")

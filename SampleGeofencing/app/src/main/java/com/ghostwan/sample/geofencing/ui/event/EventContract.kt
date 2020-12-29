@@ -17,6 +17,7 @@ interface EventContract {
         fun setHomeLocation(latitude: Long, longitude: Long)
         fun setPreference(preference: Preference, value: Boolean)
         fun saveHome(home: Home)
+        fun permissionAsked()
     }
 
     interface View {
@@ -29,6 +30,8 @@ interface EventContract {
         fun showDKMA()
         fun showEnableAutoStart()
         fun isAutoStartPermissionAvailable(): Boolean
+        fun showOptimisationDialog()
+        fun askForPermission()
     }
 
 }

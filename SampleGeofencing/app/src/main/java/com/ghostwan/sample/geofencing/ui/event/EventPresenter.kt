@@ -16,6 +16,7 @@ class EventPresenter(
     EventContract.Presenter, CoroutineScope {
 
 
+    private var arePermissionAsked: Boolean = false
     private var view: EventContract.View? = null
     private var job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -30,6 +31,12 @@ class EventPresenter(
     override fun checkStateMachine() {
         launch {
             when {
+                !arePermissionAsked -> withContext(Main) {
+                    view?.askForPermission()
+                }
+                preferenceManager.isNotExist(Preference.UNOPTIMIZATION) -> withContext(Main) {
+                    view?.showOptimisationDialog()
+                }
                 preferenceManager.isNotExistSet(Preference.DKMA) -> withContext(Main) {
                     view?.showDKMA()
                 }
@@ -115,5 +122,10 @@ class EventPresenter(
         launch {
             repository.saveHomeData(home)
         }
+    }
+
+    override fun permissionAsked() {
+        arePermissionAsked = true
+        checkStateMachine()
     }
 }

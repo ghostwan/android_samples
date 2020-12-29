@@ -61,4 +61,7 @@
     <string name="enable_location">Please enable your location services</string>
     <string name="app_optimized_title">Battery Optimization issue</string>
     <string name="app_optimized_message">Please unoptimized this app to make it work properly in background</string>
+    <string name="permission_refused">If you don\'t grant all the required permission the app won\'t work correctly</string>
+    <string name="unoptimization_refused">If you don\'t unoptimized the app it won\'t work properly in background</string>
+    <string name="grant">Grant</string>
 </resources>

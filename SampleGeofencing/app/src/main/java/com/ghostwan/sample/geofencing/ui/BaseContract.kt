@@ -5,5 +5,4 @@ interface BaseContract {
         fun checkStateMachine()
     }
 
-    interface BaseView
 }

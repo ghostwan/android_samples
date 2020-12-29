@@ -20,7 +20,7 @@ abstract class BaseFragment : Fragment(), CoroutineScope {
         const val INTENT_UPDATE_STATUS: String = "INTENT_UPDATE_STATUS"
     }
 
-    private val broadcastManager by lazy { LocalBroadcastManager.getInstance(context!!) }
+    private val broadcastManager by lazy { LocalBroadcastManager.getInstance(requireContext()) }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {

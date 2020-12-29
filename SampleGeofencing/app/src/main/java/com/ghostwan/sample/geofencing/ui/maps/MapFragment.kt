@@ -12,7 +12,7 @@ import android.view.*
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
-import com.ghostwan.sample.geofencing.LocationPermissionCompat
+import com.ghostwan.sample.geofencing.geofencing.LocationPermissionManager
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.HomeManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
@@ -50,6 +50,7 @@ class MapFragment : BaseFragment(), MapContract.View {
     var currentTmpMarker: Pair<Marker, Circle>? = null
 
     private val presenter by inject<MapContract.Presenter>()
+    private val locationPermissionManager by inject<LocationPermissionManager>()
     private var googleMap: GoogleMap? = null
     private lateinit var root: View
 
@@ -114,7 +115,7 @@ class MapFragment : BaseFragment(), MapContract.View {
     }
 
     override suspend fun checkAndAskPermissions(): Boolean {
-        val result =  context?.let { LocationPermissionCompat.isBackgroundLocationGranted(it) } ?: false
+        val result =  context?.let { locationPermissionManager.isBackgroundLocationGranted() } ?: false
         Log.d("Sample", "result is $result")
         return result
     }

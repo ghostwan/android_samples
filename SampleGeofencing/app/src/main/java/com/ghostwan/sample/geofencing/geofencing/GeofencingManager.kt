@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.ghostwan.sample.geofencing.LocationPermissionCompat
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.analytics.AnalyticsManager
@@ -31,6 +30,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
     private val repository by inject<Repository>()
     private val notificationManager by inject<NotificationManager>()
     private val analyticsManager by inject<AnalyticsManager>()
+    private val locationPermissionCompat by inject<LocationPermissionManager>()
 
     private val job = Job()
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
@@ -47,7 +47,7 @@ class GeofencingManager(val context: Context) : KoinComponent, CoroutineScope {
     @SuppressLint("MissingPermission")
     fun registerGeofencing(force: Boolean = false) {
         launch {
-            if (!LocationPermissionCompat.isBackgroundLocationGranted(context)) {
+            if (!locationPermissionCompat.isBackgroundLocationGranted()) {
                 notificationManager.display(R.string.geofecing_registration, R.string.geofencing_permission_issue)
                 return@launch
             }

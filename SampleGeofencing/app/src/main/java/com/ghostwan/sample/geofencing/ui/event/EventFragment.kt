@@ -1,5 +1,6 @@
 package com.ghostwan.sample.geofencing.ui.event
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -7,19 +8,24 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.app.ActivityCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.auth.AuthUI
+import com.ghostwan.sample.geofencing.geofencing.LocationPermissionManager
 import com.ghostwan.sample.geofencing.MainApplication.Companion.TAG
+import com.ghostwan.sample.geofencing.geofencing.AppOptimizationManager
 import com.ghostwan.sample.geofencing.R
 import com.ghostwan.sample.geofencing.data.Preference
 import com.ghostwan.sample.geofencing.data.Source
 import com.ghostwan.sample.geofencing.data.model.Event
 import com.ghostwan.sample.geofencing.data.model.Home
 import com.ghostwan.sample.geofencing.geofencing.AutoStartManager
+import com.ghostwan.sample.geofencing.geofencing.GeofencingManager
 import com.ghostwan.sample.geofencing.ui.BaseContract
 import com.ghostwan.sample.geofencing.ui.BaseFragment
 import com.ghostwan.sample.geofencing.ui.maps.MapFragment
@@ -42,6 +48,9 @@ class EventFragment : BaseFragment(), EventContract.View {
 
     private val presenter by inject<EventContract.Presenter>()
     private val autoStartManager by inject<AutoStartManager>()
+    private val geofencingManager by inject<GeofencingManager>()
+    private val permissionManager by inject<LocationPermissionManager>()
+    private val optimizationManager by inject<AppOptimizationManager>()
 
     private val viewManager: RecyclerView.LayoutManager by lazy { LinearLayoutManager(context) }
     private val viewAdapter: EventAdapter by lazy { EventAdapter() }
@@ -80,6 +89,8 @@ class EventFragment : BaseFragment(), EventContract.View {
         } catch (e: Exception) {
             Log.w(TAG, "already attached")
         }
+        permissionManager.init(this)
+        optimizationManager.init(this)
         return root
     }
 
@@ -122,13 +133,13 @@ class EventFragment : BaseFragment(), EventContract.View {
             // If I am home I want to say that I left
             activity?.title = getString(R.string.i_am_home)
             fab?.setImageResource(R.drawable.exit_home)
-            fab?.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.leftTint))
+            fab?.backgroundTintList = ColorStateList.valueOf(requireContext().getColor(R.color.leftTint))
             fab?.setOnClickListener { presenter.leaveHome(Source.App) }
         } else {
             // If I am not home I want to say that I came
             activity?.title = getString(R.string.i_left_home)
             fab?.setImageResource(R.drawable.enter_home)
-            fab?.backgroundTintList = ColorStateList.valueOf(context!!.getColor(R.color.homeTint))
+            fab?.backgroundTintList = ColorStateList.valueOf(requireContext().getColor(R.color.homeTint))
             fab?.setOnClickListener { presenter.enterHome(Source.App) }
         }
         presenter.refreshEventList()
@@ -171,8 +182,15 @@ class EventFragment : BaseFragment(), EventContract.View {
                     presenter.setPreference(Preference.AUTHENTICATED, false)
                 }
             }
+            else -> {
+                presenter.checkStateMachine()
+            }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun toast(resource: Int) {
+        Toast.makeText(context, resource, Toast.LENGTH_LONG).show()
     }
 
     override fun askToLogin() {
@@ -344,5 +362,57 @@ class EventFragment : BaseFragment(), EventContract.View {
         return context?.ifNotNull {
             autoStartManager.isSettingsHandle(it)
         } ?: elseNull { false }
+    }
+
+    override fun askForPermission() {
+        Log.v("test" , ""+shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION))
+        if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            dialogBuilder()
+                .setMessage(R.string.permission_refused)
+                .setPositiveButton(R.string.grant) { _, _ ->
+                    ask()
+                }
+                .setNegativeButton(R.string.cancel) { _, _ ->
+                    presenter.permissionAsked()
+                }
+                .create()
+                .show()
+        } else {
+            ask()
+        }
+
+    }
+
+    private fun ask() {
+        permissionManager.checkOrAskPermission(dialogBuilder(), object : LocationPermissionManager.ResultListener {
+            override fun onPermissionsAccepted(isLocationServiceEnabled: Boolean) {
+                when {
+                    isLocationServiceEnabled -> geofencingManager.registerGeofencing(true)
+                    else -> toast(R.string.enable_location)
+                }
+                presenter.permissionAsked()
+            }
+
+            override fun onPermissionsRefused() {
+                toast(R.string.permission_refused)
+                presenter.permissionAsked()
+            }
+        })
+    }
+
+    override fun showOptimisationDialog() {
+        optimizationManager.checkOrAskUnoptimization(dialogBuilder(), object : AppOptimizationManager.ResultListener {
+            override fun onAppEfficient() {
+                presenter.setPreference(Preference.UNOPTIMIZATION, true)
+            }
+
+            override fun onAppOptimized() {
+                toast(R.string.unoptimization_refused)
+                presenter.setPreference(Preference.UNOPTIMIZATION, false)
+            }
+
+        })
     }
 }
